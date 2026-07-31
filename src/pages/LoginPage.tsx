@@ -34,7 +34,11 @@ export function LoginPage() {
       navigate('/')
     } catch (err) {
       if (err instanceof ApiClientError) {
-        setError(err.message || 'Credenciales inválidas')
+        setError(
+          err.status === 0
+            ? err.message
+            : err.message || 'Credenciales inválidas',
+        )
       } else {
         setError('No se pudo iniciar sesión. Intente de nuevo.')
       }

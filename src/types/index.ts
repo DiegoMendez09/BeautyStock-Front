@@ -101,3 +101,9 @@ export interface FaqSearchResult {
   answer: string
   categoryName?: string
 }
+
+export interface TypeaheadItem {
+  id: number
+  label: string
+  secondary?: string | null
+}

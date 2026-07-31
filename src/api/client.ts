@@ -29,12 +29,20 @@ export async function apiClient<T>(
     headers['Content-Type'] = 'application/json'
   }
 
-  const response = await fetch(`${baseUrl}${path}`, {
-    ...rest,
-    headers,
-    credentials: 'include',
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  })
+  let response: Response
+  try {
+    response = await fetch(`${baseUrl}${path}`, {
+      ...rest,
+      headers,
+      credentials: 'include',
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    })
+  } catch {
+    throw new ApiClientError(
+      'No se pudo conectar con el servidor. Verifica que la API esté en ejecución.',
+      0,
+    )
+  }
 
   if (!response.ok) {
     let message = response.statusText

@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { TypeaheadInput } from '../../components/ui/TypeaheadInput'
 import { useProductsQuery } from '../../hooks/useCatalogQueries'
 
 function formatPrice(value: number): string {
@@ -9,7 +11,17 @@ function formatPrice(value: number): string {
 }
 
 export function ProductsPage() {
-  const { data: products = [], isLoading, isError } = useProductsQuery()
+  const [search, setSearch] = useState('')
+  const [categoryId, setCategoryId] = useState<number | undefined>()
+  const [brandId, setBrandId] = useState<number | undefined>()
+  const [categoryLabel, setCategoryLabel] = useState('')
+  const [brandLabel, setBrandLabel] = useState('')
+
+  const { data: products = [], isLoading, isError } = useProductsQuery({
+    search: search || undefined,
+    categoryId,
+    brandId,
+  })
 
   return (
     <div className="page">
@@ -17,6 +29,50 @@ export function ProductsPage() {
         <h1 className="page-title">Productos</h1>
         <p className="page-subtitle">Catálogo de productos del inventario</p>
       </header>
+
+      <div className="page-filters">
+        <div className="form-group">
+          <label className="form-label" htmlFor="product-search">
+            Buscar producto
+          </label>
+          <input
+            id="product-search"
+            type="search"
+            className="form-input"
+            placeholder="Nombre del producto..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <TypeaheadInput
+          entity="categories"
+          label="Categoría"
+          placeholder="Filtrar por categoría..."
+          valueLabel={categoryLabel}
+          onSelect={(item) => {
+            setCategoryId(item.id)
+            setCategoryLabel(item.label)
+          }}
+          onClear={() => {
+            setCategoryId(undefined)
+            setCategoryLabel('')
+          }}
+        />
+        <TypeaheadInput
+          entity="brands"
+          label="Marca"
+          placeholder="Filtrar por marca..."
+          valueLabel={brandLabel}
+          onSelect={(item) => {
+            setBrandId(item.id)
+            setBrandLabel(item.label)
+          }}
+          onClear={() => {
+            setBrandId(undefined)
+            setBrandLabel('')
+          }}
+        />
+      </div>
 
       {isError && <div className="alert alert-error">No se pudieron cargar los productos</div>}
 

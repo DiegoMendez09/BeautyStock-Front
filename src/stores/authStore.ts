@@ -48,13 +48,23 @@ async function loadMenuSafe(): Promise<ModuleMenuItem[]> {
   }
 }
 
+function isPublicAuthPath(pathname: string = window.location.pathname): boolean {
+  return pathname === '/login' || pathname.startsWith('/login/')
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   menu: [],
   isAuthenticated: false,
-  isBootstrapping: true,
+  // En /login no hay sesión que restaurar: evita spinner y llamada a /auth/me.
+  isBootstrapping: !isPublicAuthPath(),
 
   bootstrap: async () => {
+    if (isPublicAuthPath()) {
+      set({ isBootstrapping: false })
+      return
+    }
+
     set({ isBootstrapping: true })
     try {
       const user = await getMe()

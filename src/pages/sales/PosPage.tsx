@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
-import { getProductByBarcode } from '../../api/catalog'
+import { getProductByBarcode, getProductVariantById } from '../../api/catalog'
+import { TypeaheadInput } from '../../components/ui/TypeaheadInput'
 import { useCreateSaleMutation } from '../../hooks/useSalesMutations'
 import type { CartLine } from '../../types'
 import './PosPage.css'
@@ -17,6 +18,8 @@ export function PosPage() {
   const [cart, setCart] = useState<CartLine[]>([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [customerId, setCustomerId] = useState<number | undefined>()
+  const [customerLabel, setCustomerLabel] = useState('')
   const barcodeRef = useRef<HTMLInputElement>(null)
   const createSaleMutation = useCreateSaleMutation()
 
@@ -25,34 +28,41 @@ export function PosPage() {
     0,
   )
 
-  const addByBarcode = useCallback(async (code: string) => {
-    const trimmed = code.trim()
-    if (!trimmed) return
-
-    setError('')
-    try {
-      const variant = await getProductByBarcode(trimmed)
-      setCart((prev) => {
-        const existing = prev.find(
-          (line) => line.variant.productVariantId === variant.productVariantId,
+  const addVariantToCart = useCallback((variant: CartLine['variant']) => {
+    setCart((prev) => {
+      const existing = prev.find(
+        (line) => line.variant.productVariantId === variant.productVariantId,
+      )
+      if (existing) {
+        return prev.map((line) =>
+          line.variant.productVariantId === variant.productVariantId
+            ? { ...line, quantity: line.quantity + 1 }
+            : line,
         )
-        if (existing) {
-          return prev.map((line) =>
-            line.variant.productVariantId === variant.productVariantId
-              ? { ...line, quantity: line.quantity + 1 }
-              : line,
-          )
-        }
-        return [...prev, { variant, quantity: 1 }]
-      })
-      setBarcode('')
-      barcodeRef.current?.focus()
-    } catch {
-      setError(`Producto no encontrado: ${trimmed}`)
-      setBarcode('')
-      barcodeRef.current?.focus()
-    }
+      }
+      return [...prev, { variant, quantity: 1 }]
+    })
   }, [])
+
+  const addByBarcode = useCallback(
+    async (code: string) => {
+      const trimmed = code.trim()
+      if (!trimmed) return
+
+      setError('')
+      try {
+        const variant = await getProductByBarcode(trimmed)
+        addVariantToCart(variant)
+        setBarcode('')
+        barcodeRef.current?.focus()
+      } catch {
+        setError(`Producto no encontrado: ${trimmed}`)
+        setBarcode('')
+        barcodeRef.current?.focus()
+      }
+    },
+    [addVariantToCart],
+  )
 
   const handleScanSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -90,6 +100,7 @@ export function PosPage() {
 
     try {
       const response = await createSaleMutation.mutateAsync({
+        customerId,
         lines: cart.map((line) => ({
           productVariantId: line.variant.productVariantId,
           quantity: line.quantity,
@@ -119,6 +130,40 @@ export function PosPage() {
 
       <div className="pos-page">
         <div>
+          <div className="page-filters" style={{ marginBottom: '1rem' }}>
+            <TypeaheadInput
+              entity="product-variants"
+              label="Buscar variante"
+              placeholder="SKU, nombre o código..."
+              minLength={1}
+              onSelect={(item) => {
+                void (async () => {
+                  setError('')
+                  try {
+                    const variant = await getProductVariantById(item.id)
+                    addVariantToCart(variant)
+                  } catch {
+                    setError('No se pudo agregar la variante seleccionada')
+                  }
+                })()
+              }}
+            />
+            <TypeaheadInput
+              entity="customers"
+              label="Cliente (opcional)"
+              placeholder="Buscar cliente..."
+              valueLabel={customerLabel}
+              onSelect={(item) => {
+                setCustomerId(item.id)
+                setCustomerLabel(item.label)
+              }}
+              onClear={() => {
+                setCustomerId(undefined)
+                setCustomerLabel('')
+              }}
+            />
+          </div>
+
           <form className="pos-scan" onSubmit={handleScanSubmit}>
             <div className="form-group">
               <label className="form-label" htmlFor="barcode">
@@ -208,6 +253,12 @@ export function PosPage() {
 
         <div className="card pos-summary">
           <h2 className="card-title">Resumen</h2>
+          {customerLabel && (
+            <div className="pos-summary__row">
+              <span>Cliente</span>
+              <span>{customerLabel}</span>
+            </div>
+          )}
           <div className="pos-summary__row">
             <span>Artículos</span>
             <span>{cart.reduce((sum, line) => sum + line.quantity, 0)}</span>

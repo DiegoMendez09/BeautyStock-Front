@@ -9,7 +9,7 @@ export function useCreateSaleMutation() {
   return useMutation({
     mutationFn: (request: CreateSaleRequest) => createSale(request),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.products })
+      void queryClient.invalidateQueries({ queryKey: ['catalog', 'products'] })
       void queryClient.invalidateQueries({ queryKey: queryKeys.sales })
     },
   })
