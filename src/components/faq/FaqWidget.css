@@ -1,0 +1,96 @@
+.faq-widget__toggle {
+  position: fixed;
+  bottom: var(--space-xl);
+  right: var(--space-xl);
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-size: 1.25rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.faq-widget__toggle:hover {
+  background: var(--color-accent-hover);
+  transform: scale(1.05);
+}
+
+.faq-widget__panel {
+  position: fixed;
+  bottom: calc(var(--space-xl) + 4rem);
+  right: var(--space-xl);
+  width: 360px;
+  max-height: 480px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  overflow: hidden;
+}
+
+.faq-widget__header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-blush);
+}
+
+.faq-widget__title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--color-charcoal);
+}
+
+.faq-widget__search {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.faq-widget__results {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm);
+}
+
+.faq-widget__item {
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.faq-widget__item:hover {
+  background: var(--color-blush);
+}
+
+.faq-widget__question {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
+  margin-bottom: var(--space-xs);
+}
+
+.faq-widget__answer {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.faq-widget__empty {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.faq-widget__loading {
+  padding: var(--space-lg);
+  text-align: center;
+}

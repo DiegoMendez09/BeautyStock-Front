@@ -1,0 +1,66 @@
+.topbar {
+  height: var(--topbar-height);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-xl);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar__greeting {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.topbar__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.topbar__avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background: var(--color-blush);
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.topbar__info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.topbar__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
+}
+
+.topbar__role {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.topbar__logout {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.topbar__logout:hover {
+  background: var(--color-blush);
+  color: var(--color-accent);
+}
