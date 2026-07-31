@@ -1,6 +1,10 @@
-import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, type FormEvent } from 'react'
+import { createProduct } from '../../api/catalogMutations'
+import { Can } from '../../components/auth/Can'
 import { TypeaheadInput } from '../../components/ui/TypeaheadInput'
 import { useProductsQuery } from '../../hooks/useCatalogQueries'
+import { P } from '../../lib/permissions'
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -11,11 +15,19 @@ function formatPrice(value: number): string {
 }
 
 export function ProductsPage() {
+  const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState<number | undefined>()
   const [brandId, setBrandId] = useState<number | undefined>()
   const [categoryLabel, setCategoryLabel] = useState('')
   const [brandLabel, setBrandLabel] = useState('')
+
+  const [createName, setCreateName] = useState('')
+  const [createCategoryId, setCreateCategoryId] = useState<number | undefined>()
+  const [createBrandId, setCreateBrandId] = useState<number | undefined>()
+  const [createCategoryLabel, setCreateCategoryLabel] = useState('')
+  const [createBrandLabel, setCreateBrandLabel] = useState('')
+  const [createError, setCreateError] = useState('')
 
   const { data: products = [], isLoading, isError } = useProductsQuery({
     search: search || undefined,
@@ -23,12 +35,89 @@ export function ProductsPage() {
     brandId,
   })
 
+  const createMutation = useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['catalog', 'products'] })
+      setCreateName('')
+      setCreateCategoryId(undefined)
+      setCreateBrandId(undefined)
+      setCreateCategoryLabel('')
+      setCreateBrandLabel('')
+      setCreateError('')
+    },
+    onError: () => setCreateError('No se pudo crear el producto'),
+  })
+
+  const handleCreate = (e: FormEvent) => {
+    e.preventDefault()
+    if (!createCategoryId || !createBrandId) {
+      setCreateError('Selecciona categoría y marca')
+      return
+    }
+    createMutation.mutate({
+      name: createName,
+      categoryId: createCategoryId,
+      brandId: createBrandId,
+    })
+  }
+
   return (
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">Productos</h1>
         <p className="page-subtitle">Catálogo de productos del inventario</p>
       </header>
+
+      <Can permission={P.Catalog.Create}>
+        <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
+          <h2 className="card-title">Nuevo producto</h2>
+          {createError && <div className="alert alert-error">{createError}</div>}
+          <div className="page-filters">
+            <div className="form-group">
+              <label className="form-label">Nombre</label>
+              <input
+                className="form-input"
+                required
+                value={createName}
+                onChange={(e) => setCreateName(e.target.value)}
+                placeholder="Ej. Serum vitamina C"
+              />
+            </div>
+            <TypeaheadInput
+              entity="categories"
+              label="Categoría"
+              placeholder="Buscar categoría..."
+              valueLabel={createCategoryLabel}
+              onSelect={(item) => {
+                setCreateCategoryId(item.id)
+                setCreateCategoryLabel(item.label)
+              }}
+              onClear={() => {
+                setCreateCategoryId(undefined)
+                setCreateCategoryLabel('')
+              }}
+            />
+            <TypeaheadInput
+              entity="brands"
+              label="Marca"
+              placeholder="Buscar marca..."
+              valueLabel={createBrandLabel}
+              onSelect={(item) => {
+                setCreateBrandId(item.id)
+                setCreateBrandLabel(item.label)
+              }}
+              onClear={() => {
+                setCreateBrandId(undefined)
+                setCreateBrandLabel('')
+              }}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary" disabled={createMutation.isPending}>
+            {createMutation.isPending ? 'Creando...' : 'Crear producto'}
+          </button>
+        </form>
+      </Can>
 
       <div className="page-filters">
         <div className="form-group">

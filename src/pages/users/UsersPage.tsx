@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { createUser, deleteUser, getRoles, getUsers, updateUser } from '../../api/users'
+import { Can } from '../../components/auth/Can'
 import { useAuth } from '../../hooks/useAuth'
+import { P } from '../../lib/permissions'
 import type { UserAccount } from '../../types'
 
 export function UsersPage() {
   const { hasPermission } = useAuth()
-  const canManage = hasPermission('Users.Manage')
+  const canManage = hasPermission(P.Users.Manage)
   const queryClient = useQueryClient()
   const { data: users = [], isLoading, isError } = useQuery({
     queryKey: ['users'],
@@ -67,7 +69,7 @@ export function UsersPage() {
       {error && <div className="alert alert-error">{error}</div>}
       {isError && <div className="alert alert-error">No se pudieron cargar los usuarios</div>}
 
-      {canManage && (
+      <Can permission={P.Users.Manage}>
         <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
           <h2 className="card-title">Nuevo usuario</h2>
           <div className="page-filters">
@@ -119,7 +121,7 @@ export function UsersPage() {
             Crear
           </button>
         </form>
-      )}
+      </Can>
 
       {isLoading ? (
         <div className="loading-screen" style={{ minHeight: 160 }}>
@@ -134,7 +136,7 @@ export function UsersPage() {
                 <th>Correo</th>
                 <th>Rol</th>
                 <th>Estado</th>
-                {canManage && <th />}
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -148,8 +150,8 @@ export function UsersPage() {
                       {user.isActive ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
-                  {canManage && (
-                    <td>
+                  <td>
+                    <Can permission={P.Users.Manage}>
                       <button
                         type="button"
                         className="btn btn-ghost btn-sm"
@@ -164,8 +166,8 @@ export function UsersPage() {
                       >
                         Baja
                       </button>
-                    </td>
-                  )}
+                    </Can>
+                  </td>
                 </tr>
               ))}
             </tbody>

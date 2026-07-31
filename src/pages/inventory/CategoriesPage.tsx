@@ -1,13 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { createCategory, deleteCategory } from '../../api/catalogMutations'
-import { useAuth } from '../../hooks/useAuth'
+import { Can } from '../../components/auth/Can'
 import { useCategoriesQuery } from '../../hooks/useCatalogQueries'
+import { P } from '../../lib/permissions'
 
 export function CategoriesPage() {
-  const { hasPermission } = useAuth()
-  const canCreate = hasPermission('Catalog.Create')
-  const canDelete = hasPermission('Catalog.Delete')
   const queryClient = useQueryClient()
   const { data: categories = [], isLoading, isError } = useCategoriesQuery()
   const [name, setName] = useState('')
@@ -41,7 +39,7 @@ export function CategoriesPage() {
 
       {isError && <div className="alert alert-error">No se pudieron cargar las categorías</div>}
 
-      {canCreate && (
+      <Can permission={P.Catalog.Create}>
         <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
           <h2 className="card-title">Nueva categoría</h2>
           <div className="page-filters">
@@ -67,7 +65,7 @@ export function CategoriesPage() {
             Crear
           </button>
         </form>
-      )}
+      </Can>
 
       {isLoading ? (
         <div className="loading-screen" style={{ minHeight: '200px' }}>
@@ -83,7 +81,7 @@ export function CategoriesPage() {
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Estado</th>
-                {canDelete && <th />}
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -98,8 +96,8 @@ export function CategoriesPage() {
                       {category.isActive ? 'Activa' : 'Inactiva'}
                     </span>
                   </td>
-                  {canDelete && (
-                    <td>
+                  <td>
+                    <Can permission={P.Catalog.Delete}>
                       {category.isActive && (
                         <button
                           type="button"
@@ -109,8 +107,8 @@ export function CategoriesPage() {
                           Desactivar
                         </button>
                       )}
-                    </td>
-                  )}
+                    </Can>
+                  </td>
                 </tr>
               ))}
             </tbody>
