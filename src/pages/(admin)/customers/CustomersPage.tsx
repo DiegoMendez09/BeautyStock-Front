@@ -8,6 +8,7 @@ import {
   updateCustomer,
 } from '../../../api/customers'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
+import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { useAuth } from '../../../hooks/useAuth'
@@ -73,48 +74,53 @@ export function CustomersPage() {
       {isError && <div className="alert alert-error">No se pudieron cargar los clientes</div>}
 
       {canCreate && (
-        <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
-          <h2 className="card-title">Nuevo cliente</h2>
-          <div className="page-filters">
-            <div className="form-group">
-              <label className="form-label">Nombre</label>
-              <input
-                className="form-input"
-                required
-                value={form.fullName}
-                onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Correo</label>
-              <input
-                type="email"
-                className="form-input"
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Teléfono</label>
-              <input
-                className="form-input"
-                value={form.phone}
-                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Documento</label>
-              <input
-                className="form-input"
-                value={form.documentNumber}
-                onChange={(e) => setForm((f) => ({ ...f, documentNumber: e.target.value }))}
-              />
-            </div>
+        <>
+          <div style={{ marginBottom: '1.25rem' }}>
+            <BulkUploadDialog module="customers" onSuccess={invalidate} />
           </div>
-          <button type="submit" className="btn btn-primary" disabled={createMutation.isPending}>
-            Crear
-          </button>
-        </form>
+          <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
+            <h2 className="card-title">Nuevo cliente</h2>
+            <div className="page-filters">
+              <div className="form-group">
+                <label className="form-label">Nombre</label>
+                <input
+                  className="form-input"
+                  required
+                  value={form.fullName}
+                  onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Correo</label>
+                <input
+                  type="email"
+                  className="form-input"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Teléfono</label>
+                <input
+                  className="form-input"
+                  value={form.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Documento</label>
+                <input
+                  className="form-input"
+                  value={form.documentNumber}
+                  onChange={(e) => setForm((f) => ({ ...f, documentNumber: e.target.value }))}
+                />
+              </div>
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={createMutation.isPending}>
+              Crear
+            </button>
+          </form>
+        </>
       )}
 
       {isLoading ? (

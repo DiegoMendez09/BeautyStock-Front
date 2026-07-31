@@ -9,6 +9,7 @@ import {
 } from '../../../api/catalogMutations'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
+import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { TypeaheadInput } from '../../../components/ui/TypeaheadInput'
@@ -80,7 +81,8 @@ export function ProductsPage() {
         <p className="page-subtitle" style={{ marginBottom: '0.75rem' }}>
           Primero registre una compra al proveedor. En Compras → Nueva orden puede elegir una
           presentación ya registrada o crear producto + presentación/SKU en la misma línea. Al
-          recibir la orden entran las existencias y ya puede vender.
+          recibir la orden entran las existencias y ya puede vender. La carga masiva solo permite
+          actualizar, desactivar o eliminar productos existentes.
         </p>
         <Can permission={P.Purchases.Create}>
           <Link to="/compras" className="btn btn-primary">
@@ -88,6 +90,17 @@ export function ProductsPage() {
           </Link>
         </Can>
       </div>
+
+      <Can anyOf={[P.Catalog.Update, P.Catalog.Delete, P.Catalog.Manage]}>
+        <div style={{ marginBottom: '1.25rem' }}>
+          <BulkUploadDialog
+            module="products"
+            title="Acciones masivas"
+            allowedActions={['update', 'deactivate', 'delete']}
+            onSuccess={invalidate}
+          />
+        </div>
+      </Can>
 
       <div className="page-filters">
         <div className="form-group">

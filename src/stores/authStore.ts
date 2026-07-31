@@ -20,6 +20,7 @@ const FALLBACK_MENU: ModuleMenuItem[] = [
   { moduleId: 3, code: 'Sales', name: 'Ventas', routePath: '/ventas/pos', iconKey: 'sales', sortOrder: 3 },
   { moduleId: 4, code: 'Customers', name: 'Clientes', routePath: '/clientes', iconKey: 'customers', sortOrder: 4 },
   { moduleId: 5, code: 'Reports', name: 'Reportes', routePath: '/reportes', iconKey: 'reports', sortOrder: 5 },
+  { moduleId: 6, code: 'Faq', name: 'Preguntas frecuentes', routePath: '/faq', iconKey: 'faq', sortOrder: 6 },
   { moduleId: 7, code: 'Audit', name: 'Auditoría', routePath: '/auditoria', iconKey: 'audit', sortOrder: 7 },
   { moduleId: 8, code: 'Users', name: 'Usuarios', routePath: '/usuarios', iconKey: 'users', sortOrder: 8 },
 ]

@@ -143,7 +143,7 @@ function ChatPanel({ variant }: { variant: 'admin' | 'store' }) {
     setBusy(true)
 
     try {
-      const result = await searchFaq(q)
+      const result = await searchFaq(q, useChatStore.getState().sessionId)
       const next: ChatMessage[] = []
       const articleCount = result.articles.length
       const productCount = result.products.length

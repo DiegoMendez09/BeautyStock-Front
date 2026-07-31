@@ -93,13 +93,13 @@ export async function apiClient<T>(
   return response.json() as Promise<T>
 }
 
-/** Descarga un archivo binario (p. ej. PDF) y dispara la descarga en el navegador. */
+/** Descarga un archivo binario (PDF, CSV, etc.) y dispara la descarga en el navegador. */
 export async function downloadBlob(path: string, filename: string): Promise<void> {
   let response: Response
   try {
     response = await fetch(`${baseUrl}${path}`, {
       credentials: 'include',
-      headers: { Accept: 'application/pdf' },
+      headers: { Accept: '*/*' },
     })
   } catch {
     throw new ApiClientError(
@@ -111,7 +111,7 @@ export async function downloadBlob(path: string, filename: string): Promise<void
   if (!response.ok) {
     let message: string
     if (response.status === 403) {
-      message = 'No tienes permiso para exportar este PDF.'
+      message = 'No tienes permiso para descargar este archivo.'
     } else if (response.status === 401) {
       message = 'Sesión expirada. Vuelve a iniciar sesión.'
     } else {

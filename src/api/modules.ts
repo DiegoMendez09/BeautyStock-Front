@@ -221,6 +221,8 @@ export async function getFaqCategories(): Promise<FaqCategory[]> {
 
 export interface FaqArticleListParams extends PageParams {
   includeInactive?: boolean
+  search?: string
+  isActive?: boolean
 }
 
 export async function getFaqArticles(
@@ -228,6 +230,8 @@ export async function getFaqArticles(
 ): Promise<PagedResult<FaqArticleAdmin>> {
   const qs = buildQueryString({
     includeInactive: params.includeInactive,
+    search: params.search,
+    isActive: params.isActive,
     page: params.page,
     pageSize: params.pageSize,
   })

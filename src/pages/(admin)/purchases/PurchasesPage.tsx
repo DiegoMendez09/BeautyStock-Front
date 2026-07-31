@@ -12,6 +12,7 @@ import {
 } from '../../../api/modules'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
+import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { TypeaheadInput } from '../../../components/ui/TypeaheadInput'
@@ -751,6 +752,13 @@ export function PurchasesPage() {
       {tab === 'suppliers' && (
         <>
           <Can permission={P.Purchases.Create}>
+            <div style={{ marginBottom: '1.25rem' }}>
+              <BulkUploadDialog
+                module="suppliers"
+                allowedActions={['create', 'deactivate', 'delete']}
+                onSuccess={invalidateSuppliers}
+              />
+            </div>
             <form className="card" onSubmit={handleSupplier} style={{ marginBottom: '1.25rem' }}>
               <h2 className="card-title">Nuevo proveedor</h2>
               <div className="page-filters">

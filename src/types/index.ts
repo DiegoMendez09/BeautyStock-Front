@@ -214,9 +214,50 @@ export interface NotificationItem {
 export interface LoginLogItem {
   loginLogId: number
   userAccountId?: number | null
+  userFullName?: string | null
   emailAttempted: string
   isSuccess: boolean
   failureReason?: string | null
   ipAddress?: string | null
   attemptedAt: string
+}
+
+export interface AuditLogItem {
+  auditLogId: number
+  userAccountId?: number | null
+  userFullName?: string | null
+  entityName: string
+  entityId: string
+  action: string
+  moduleCode?: string | null
+  ipAddress?: string | null
+  createdAt: string
+}
+
+export interface ApplicationLogItem {
+  applicationLogId: number
+  userAccountId?: number | null
+  userFullName?: string | null
+  level: string
+  source?: string | null
+  message: string
+  httpMethod?: string | null
+  requestPath?: string | null
+  statusCode?: number | null
+  durationMs?: number | null
+  ipAddress?: string | null
+  correlationId?: string | null
+  createdAt: string
+}
+
+export interface FaqChatLogItem {
+  faqChatLogId: number
+  userAccountId?: number | null
+  userFullName?: string | null
+  sessionId?: string | null
+  queryText: string
+  matchedArticlesCount: number
+  matchedProductsCount: number
+  ipAddress?: string | null
+  createdAt: string
 }
