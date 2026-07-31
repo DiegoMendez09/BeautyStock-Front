@@ -354,3 +354,33 @@ textarea {
   color: var(--color-success);
   border: 1px solid color-mix(in srgb, var(--color-success) 25%, transparent);
 }
+
+.faq-browse {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.faq-browse__item {
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+}
+
+.faq-browse__meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.faq-browse__question {
+  font-weight: var(--font-weight-bold);
+}
+
+.faq-browse__answer {
+  margin-top: var(--space-md);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}

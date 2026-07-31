@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { login as apiLogin, logout as apiLogout, getMe, getMenu } from '../api/auth'
+import { queryClient } from '../lib/queryClient'
 import type { ModuleMenuItem, User } from '../types'
 
 const DASHBOARD_ITEM: ModuleMenuItem = {
@@ -76,6 +77,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   login: async (email, password) => {
+    queryClient.clear()
     const response = await apiLogin({ email, password })
     const menu = await loadMenuSafe()
     set({
@@ -92,6 +94,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch {
       // ignore network errors on logout
     }
+    queryClient.clear()
     set({ user: null, menu: [], isAuthenticated: false })
   },
 

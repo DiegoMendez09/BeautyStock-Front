@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { apiClient } from '../../api/client'
+import { useAuth } from '../../hooks/useAuth'
 
 interface FaqArticle {
   faqArticleId: number
@@ -10,23 +12,30 @@ interface FaqArticle {
 }
 
 export function FaqAdminPage() {
+  const { hasPermission } = useAuth()
+  const canManage = hasPermission('Faq.Manage')
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+
   const { data: articles = [], isLoading, isError } = useQuery({
-    queryKey: ['faq', 'articles'],
-    queryFn: () => apiClient<FaqArticle[]>('/api/v1/faq/articles'),
+    queryKey: ['faq', 'articles', canManage],
+    queryFn: () =>
+      apiClient<FaqArticle[]>(
+        `/api/v1/faq/articles${canManage ? '?includeInactive=true' : ''}`,
+      ),
   })
 
   return (
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">FAQ</h1>
-        <p className="page-subtitle">Artículos de ayuda del sistema</p>
+        <p className="page-subtitle">
+          {canManage
+            ? 'Administración de artículos de ayuda'
+            : 'Consulta las preguntas frecuentes del sistema'}
+        </p>
       </header>
 
-      {isError && (
-        <div className="alert alert-error">
-          No se pudo cargar el FAQ (requiere permiso Faq.Manage)
-        </div>
-      )}
+      {isError && <div className="alert alert-error">No se pudo cargar el FAQ</div>}
 
       {isLoading ? (
         <div className="loading-screen" style={{ minHeight: 160 }}>
@@ -34,7 +43,7 @@ export function FaqAdminPage() {
         </div>
       ) : articles.length === 0 ? (
         <div className="empty-state">No hay artículos FAQ</div>
-      ) : (
+      ) : canManage ? (
         <div className="table-wrapper">
           <table className="data-table">
             <thead>
@@ -63,6 +72,28 @@ export function FaqAdminPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      ) : (
+        <div className="faq-browse">
+          {articles.map((article) => {
+            const open = expandedId === article.faqArticleId
+            return (
+              <button
+                key={article.faqArticleId}
+                type="button"
+                className="card faq-browse__item"
+                onClick={() =>
+                  setExpandedId((prev) =>
+                    prev === article.faqArticleId ? null : article.faqArticleId,
+                  )
+                }
+              >
+                <div className="faq-browse__meta">{article.categoryName}</div>
+                <div className="faq-browse__question">{article.question}</div>
+                {open && <div className="faq-browse__answer">{article.answer}</div>}
+              </button>
+            )
+          })}
         </div>
       )}
     </div>
