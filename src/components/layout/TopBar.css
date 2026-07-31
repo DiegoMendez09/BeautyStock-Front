@@ -9,10 +9,11 @@
   position: sticky;
   top: 0;
   z-index: 50;
+  font-family: var(--font-family);
 }
 
 .topbar__greeting {
-  font-size: 0.875rem;
+  font-size: var(--font-size-md);
   color: var(--color-text-muted);
 }
 
@@ -25,14 +26,15 @@
 .topbar__avatar {
   width: 2rem;
   height: 2rem;
-  border-radius: var(--radius-full);
-  background: var(--color-blush);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
   color: var(--color-accent);
+  border: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 0.8125rem;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
 }
 
 .topbar__info {
@@ -42,25 +44,26 @@
 }
 
 .topbar__name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-charcoal);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
 }
 
 .topbar__role {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
 .topbar__logout {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .topbar__logout:hover {
-  background: var(--color-blush);
-  color: var(--color-accent);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
 }

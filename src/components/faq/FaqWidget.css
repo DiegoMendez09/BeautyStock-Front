@@ -2,26 +2,26 @@
   position: fixed;
   bottom: var(--space-xl);
   right: var(--space-xl);
-  width: 3.25rem;
-  height: 3.25rem;
-  border-radius: var(--radius-full);
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-md);
   background: var(--color-accent);
   color: var(--color-text-inverse);
-  font-size: 1.25rem;
-  font-weight: 700;
-  box-shadow: var(--shadow-lg);
+  font-family: var(--font-family);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-md);
   z-index: 200;
-  transition: transform var(--transition-fast), background var(--transition-fast);
+  transition: background var(--transition-fast);
 }
 
 .faq-widget__toggle:hover {
   background: var(--color-accent-hover);
-  transform: scale(1.05);
 }
 
 .faq-widget__panel {
   position: fixed;
-  bottom: calc(var(--space-xl) + 4rem);
+  bottom: calc(var(--space-xl) + 3.75rem);
   right: var(--space-xl);
   width: 360px;
   max-height: 480px;
@@ -33,18 +33,20 @@
   flex-direction: column;
   z-index: 200;
   overflow: hidden;
+  font-family: var(--font-family);
 }
 
 .faq-widget__header {
   padding: var(--space-md) var(--space-lg);
   border-bottom: 1px solid var(--color-border);
-  background: var(--color-blush);
+  background: var(--color-surface-muted);
 }
 
 .faq-widget__title {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  color: var(--color-charcoal);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
 }
 
 .faq-widget__search {
@@ -67,27 +69,27 @@
 }
 
 .faq-widget__item:hover {
-  background: var(--color-blush);
+  background: var(--color-surface-muted);
 }
 
 .faq-widget__question {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-charcoal);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
   margin-bottom: var(--space-xs);
 }
 
 .faq-widget__answer {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
-  line-height: 1.5;
+  line-height: var(--line-height-base);
 }
 
 .faq-widget__empty {
   padding: var(--space-xl);
   text-align: center;
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: var(--font-size-md);
 }
 
 .faq-widget__loading {

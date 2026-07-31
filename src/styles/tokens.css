@@ -1,35 +1,74 @@
+/**
+ * BeautyStock — Design tokens (punto único de cambio)
+ * Cambia colores, tipografía y medidas aquí; el resto del UI hereda.
+ */
 :root {
-  /* Brand palette */
-  --color-charcoal: #2a1f1c;
-  --color-blush: #f7e8e4;
-  --color-accent: #c45c6a;
-  --color-accent-hover: #b04d5a;
-  --color-ink: #1a1412;
-  --color-sage: #5c7a6a;
-  --color-sage-light: #e8f0ec;
+  /* ——— Tipografía ——— */
+  --font-family: Arial, Helvetica, sans-serif;
+  --font-display: var(--font-family);
+  --font-ui: var(--font-family);
 
-  /* Surfaces */
-  --color-bg: #faf6f4;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-md: 0.875rem;
+  --font-size-base: 0.9375rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 1.75rem;
+  --font-size-3xl: 2.25rem;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+
+  /* ——— Colores formales ——— */
+  --color-primary: #1b2a4a;
+  --color-primary-hover: #152238;
+  --color-accent: #2f5f8f;
+  --color-accent-hover: #244a70;
+
+  --color-bg: #f4f6f8;
   --color-surface: #ffffff;
-  --color-surface-elevated: #fffdfb;
-  --color-border: #e8d8d3;
-  --color-border-strong: #d4c0ba;
+  --color-surface-muted: #eef1f5;
+  --color-surface-elevated: #ffffff;
 
-  /* Text */
-  --color-text: var(--color-ink);
-  --color-text-muted: #6b5a55;
-  --color-text-inverse: #faf6f4;
+  --color-border: #d5dce3;
+  --color-border-strong: #b8c2ce;
 
-  /* Status */
-  --color-error: #c45c6a;
-  --color-success: var(--color-sage);
-  --color-warning: #c49a5c;
+  --color-text: #1a2332;
+  --color-text-muted: #5c6b7a;
+  --color-text-inverse: #ffffff;
+  --color-text-on-primary: #ffffff;
 
-  /* Typography */
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-ui: 'Outfit', system-ui, sans-serif;
+  --color-success: #2e7d4f;
+  --color-success-bg: #e8f5ee;
+  --color-error: #b42318;
+  --color-error-bg: #fceceb;
+  --color-warning: #9a6700;
+  --color-warning-bg: #fff6e0;
 
-  /* Spacing */
+  /* Alias de compatibilidad (componentes existentes) */
+  --color-charcoal: var(--color-primary);
+  --color-ink: var(--color-text);
+  --color-blush: var(--color-surface-muted);
+  --color-sage: var(--color-success);
+  --color-sage-light: var(--color-success-bg);
+
+  /* Sidebar / login oscuros */
+  --color-nav-bg: var(--color-primary);
+  --color-nav-text: rgba(255, 255, 255, 0.82);
+  --color-nav-text-muted: rgba(255, 255, 255, 0.55);
+  --color-nav-hover: rgba(255, 255, 255, 0.08);
+  --color-nav-active: rgba(47, 95, 143, 0.45);
+  --color-nav-border: rgba(255, 255, 255, 0.1);
+
+  /* Focus */
+  --color-focus-ring: rgba(47, 95, 143, 0.22);
+
+  /* ——— Espaciado ——— */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
@@ -37,20 +76,20 @@
   --space-xl: 2rem;
   --space-2xl: 3rem;
 
-  /* Layout */
-  --sidebar-width: 260px;
-  --topbar-height: 60px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  /* ——— Layout ——— */
+  --sidebar-width: 248px;
+  --topbar-height: 56px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
   --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(42, 31, 28, 0.08);
-  --shadow-md: 0 4px 16px rgba(42, 31, 28, 0.1);
-  --shadow-lg: 0 8px 32px rgba(42, 31, 28, 0.12);
+  /* ——— Sombras (sutiles / formales) ——— */
+  --shadow-sm: 0 1px 2px rgba(26, 35, 50, 0.06);
+  --shadow-md: 0 2px 8px rgba(26, 35, 50, 0.08);
+  --shadow-lg: 0 8px 24px rgba(26, 35, 50, 0.12);
 
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
+  /* ——— Transiciones ——— */
+  --transition-fast: 120ms ease;
+  --transition-base: 200ms ease;
 }
