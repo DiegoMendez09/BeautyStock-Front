@@ -1,26 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import type { ModuleMenuItem } from '../../types'
+import { SidebarMenuIcon, SidebarNavIcon } from './SidebarIcons'
 import './Sidebar.css'
-
-const ICON_MAP: Record<string, string> = {
-  dashboard: '◈',
-  products: '▣',
-  categories: '▤',
-  pos: '◉',
-  customers: '◎',
-  reports: '▥',
-  faq: '?',
-  audit: '◫',
-  users: '◌',
-  inventory: '▣',
-  sales: '◉',
-  default: '·',
-}
-
-function getIcon(iconKey: string): string {
-  return ICON_MAP[iconKey] ?? ICON_MAP.default
-}
 
 function expandMenu(menu: ModuleMenuItem[]): ModuleMenuItem[] {
   return menu.flatMap((item) => {
@@ -32,22 +14,34 @@ function expandMenu(menu: ModuleMenuItem[]): ModuleMenuItem[] {
           moduleId: item.moduleId * 100 + 1,
           name: 'Marcas',
           routePath: '/inventario/marcas',
-          iconKey: 'categories',
+          iconKey: 'brands',
         },
       ]
     }
     if (item.code === 'Inventory') {
-      return [{ ...item, name: 'Productos', routePath: '/inventario/productos' }]
+      return [{ ...item, name: 'Productos', routePath: '/inventario/productos', iconKey: 'products' }]
     }
     if (item.code === 'Sales') {
       return [
-        { ...item, name: 'POS', routePath: '/ventas/pos' },
+        { ...item, name: 'POS', routePath: '/ventas/pos', iconKey: 'pos' },
         {
           ...item,
           moduleId: item.moduleId * 100 + 2,
           name: 'Historial',
           routePath: '/ventas/historial',
-          iconKey: 'sales',
+          iconKey: 'history',
+        },
+      ]
+    }
+    if (item.code === 'Reports') {
+      return [
+        { ...item, name: 'Reportes', routePath: '/reportes', iconKey: 'reports' },
+        {
+          ...item,
+          moduleId: item.moduleId * 100 + 3,
+          name: 'Trazabilidad',
+          routePath: '/trazabilidad',
+          iconKey: 'audit',
         },
       ]
     }
@@ -74,7 +68,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
           title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
         >
-          ☰
+          <SidebarMenuIcon />
         </button>
         {!collapsed && (
           <div className="sidebar__brand-text">
@@ -94,7 +88,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               `sidebar__link${isActive ? ' sidebar__link--active' : ''}`
             }
           >
-            <span className="sidebar__icon">{getIcon(item.iconKey)}</span>
+            <span className="sidebar__icon">
+              <SidebarNavIcon iconKey={item.iconKey} />
+            </span>
             {!collapsed && <span className="sidebar__label">{item.name}</span>}
           </NavLink>
         ))}

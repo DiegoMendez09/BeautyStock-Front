@@ -4,6 +4,7 @@ import { createUser, deactivateUser, deleteUser, getRoles, getUsers, updateUser 
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
+import { PasswordInput } from '../../../components/ui/PasswordInput'
 import { RowActions } from '../../../components/ui/RowActions'
 import { useAuth } from '../../../hooks/useAuth'
 import { P } from '../../../lib/permissions'
@@ -106,16 +107,13 @@ export function UsersPage() {
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Contraseña</label>
-              <input
-                type="password"
-                className="form-input"
-                required
-                value={form.password}
-                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-              />
-            </div>
+            <PasswordInput
+              label="Contraseña"
+              required
+              autoComplete="new-password"
+              value={form.password}
+              onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+            />
             <div className="form-group">
               <label className="form-label">Rol</label>
               <select

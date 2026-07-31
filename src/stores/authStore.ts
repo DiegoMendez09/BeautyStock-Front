@@ -8,7 +8,7 @@ const DASHBOARD_ITEM: ModuleMenuItem = {
   moduleId: 0,
   code: 'Dashboard',
   name: 'Panel',
-  routePath: '/',
+  routePath: '/panel',
   iconKey: 'dashboard',
   sortOrder: 0,
 }

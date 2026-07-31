@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Outlet, useNavigate, useSearchParams } from 'react-router-dom'
 import { SkipLink } from '../../components/a11y/SkipLink'
+import { FaqWidget } from '../../components/faq/FaqWidget'
 import { useAuth } from '../../hooks/useAuth'
 import { useCartStore } from '../../stores/cartStore'
 import './StoreShell.css'
@@ -92,6 +93,8 @@ export function StoreShell() {
           <span>BeautyStock · Productos de belleza</span>
         </div>
       </footer>
+
+      <FaqWidget variant="store" />
     </div>
   )
 }

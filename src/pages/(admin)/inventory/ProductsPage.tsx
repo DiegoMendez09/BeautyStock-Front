@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Fragment, useState, type FormEvent } from 'react'
+import { Fragment, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
-  createProduct,
-  createVariant,
   deactivateProduct,
   deactivateVariant,
   deleteProduct,
@@ -15,7 +14,6 @@ import { RowActions } from '../../../components/ui/RowActions'
 import { TypeaheadInput } from '../../../components/ui/TypeaheadInput'
 import { useProductsQuery } from '../../../hooks/useCatalogQueries'
 import { P } from '../../../lib/permissions'
-import type { Product } from '../../../types'
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -36,23 +34,6 @@ export function ProductsPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
 
-  const [createName, setCreateName] = useState('')
-  const [createCategoryId, setCreateCategoryId] = useState<number | undefined>()
-  const [createBrandId, setCreateBrandId] = useState<number | undefined>()
-  const [createCategoryLabel, setCreateCategoryLabel] = useState('')
-  const [createBrandLabel, setCreateBrandLabel] = useState('')
-  const [createError, setCreateError] = useState('')
-
-  const [variantForm, setVariantForm] = useState({
-    sku: '',
-    variantName: '',
-    barcode: '',
-    salePrice: '',
-    costPrice: '',
-    stockOnHand: '0',
-    reorderLevel: '5',
-  })
-
   const { data, isLoading, isError, isFetching } = useProductsQuery({
     search: search || undefined,
     categoryId,
@@ -63,36 +44,6 @@ export function ProductsPage() {
   const products = data?.items ?? []
 
   const invalidate = () => void queryClient.invalidateQueries({ queryKey: ['catalog', 'products'] })
-
-  const createMutation = useMutation({
-    mutationFn: createProduct,
-    onSuccess: () => {
-      invalidate()
-      setCreateName('')
-      setCreateCategoryId(undefined)
-      setCreateBrandId(undefined)
-      setCreateCategoryLabel('')
-      setCreateBrandLabel('')
-      setCreateError('')
-    },
-    onError: () => setCreateError('No se pudo crear el producto'),
-  })
-
-  const variantMutation = useMutation({
-    mutationFn: createVariant,
-    onSuccess: () => {
-      invalidate()
-      setVariantForm({
-        sku: '',
-        variantName: '',
-        barcode: '',
-        salePrice: '',
-        costPrice: '',
-        stockOnHand: '0',
-        reorderLevel: '5',
-      })
-    },
-  })
 
   const deactivateProductMutation = useMutation({
     mutationFn: deactivateProduct,
@@ -114,88 +65,29 @@ export function ProductsPage() {
     onSuccess: invalidate,
   })
 
-  const handleCreate = (e: FormEvent) => {
-    e.preventDefault()
-    if (!createCategoryId || !createBrandId) {
-      setCreateError('Selecciona categoría y marca')
-      return
-    }
-    createMutation.mutate({
-      name: createName,
-      categoryId: createCategoryId,
-      brandId: createBrandId,
-    })
-  }
-
-  const handleAddVariant = (product: Product) => (e: FormEvent) => {
-    e.preventDefault()
-    variantMutation.mutate({
-      productId: product.productId,
-      sku: variantForm.sku,
-      variantName: variantForm.variantName,
-      barcode: variantForm.barcode || undefined,
-      salePrice: Number(variantForm.salePrice),
-      costPrice: Number(variantForm.costPrice),
-      stockOnHand: Number(variantForm.stockOnHand) || 0,
-      reorderLevel: Number(variantForm.reorderLevel) || 0,
-    })
-  }
-
   return (
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">Productos</h1>
         <p className="page-subtitle">
-          Productos y variantes con precio de venta/costo (Catalog + Inventory)
+          Consulta el catálogo y el stock. Los productos nuevos se dan de alta al comprar al
+          proveedor.
         </p>
       </header>
 
-      <Can permission={P.Catalog.Create}>
-        <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
-          <h2 className="card-title">Nuevo producto</h2>
-          {createError && <div className="alert alert-error">{createError}</div>}
-          <div className="page-filters">
-            <div className="form-group">
-              <label className="form-label">Nombre</label>
-              <input
-                className="form-input"
-                required
-                value={createName}
-                onChange={(e) => setCreateName(e.target.value)}
-              />
-            </div>
-            <TypeaheadInput
-              entity="categories"
-              label="Categoría"
-              valueLabel={createCategoryLabel}
-              onSelect={(item) => {
-                setCreateCategoryId(item.id)
-                setCreateCategoryLabel(item.label)
-              }}
-              onClear={() => {
-                setCreateCategoryId(undefined)
-                setCreateCategoryLabel('')
-              }}
-            />
-            <TypeaheadInput
-              entity="brands"
-              label="Marca"
-              valueLabel={createBrandLabel}
-              onSelect={(item) => {
-                setCreateBrandId(item.id)
-                setCreateBrandLabel(item.label)
-              }}
-              onClear={() => {
-                setCreateBrandId(undefined)
-                setCreateBrandLabel('')
-              }}
-            />
-          </div>
-          <button type="submit" className="btn btn-primary" disabled={createMutation.isPending}>
-            Crear producto
-          </button>
-        </form>
-      </Can>
+      <div className="card" style={{ marginBottom: '1.25rem' }}>
+        <h2 className="card-title">Alta de productos</h2>
+        <p className="page-subtitle" style={{ marginBottom: '0.75rem' }}>
+          Primero registre una compra al proveedor. En Compras → Nueva orden puede elegir una
+          presentación ya registrada o crear producto + presentación/SKU en la misma línea. Al
+          recibir la orden entra el stock y ya puede vender.
+        </p>
+        <Can permission={P.Purchases.Create}>
+          <Link to="/compras" className="btn btn-primary">
+            Ir a Compras
+          </Link>
+        </Can>
+      </div>
 
       <div className="page-filters">
         <div className="form-group">
@@ -259,7 +151,7 @@ export function ProductsPage() {
             <thead>
               <tr>
                 <th>Nombre</th>
-                <th>Variantes</th>
+                <th>Presentaciones</th>
                 <th>Categoría</th>
                 <th>Marca</th>
                 <th>Desde</th>
@@ -299,7 +191,7 @@ export function ProductsPage() {
                             )
                           }
                         >
-                          {open ? 'Ocultar' : 'Precios / variantes'}
+                          {open ? 'Ocultar' : 'Precios / presentaciones'}
                         </button>
                         <Can permission={P.Catalog.Delete}>
                           <RowActions
@@ -316,15 +208,17 @@ export function ProductsPage() {
                       <tr>
                         <td colSpan={7}>
                           <div className="card" style={{ margin: '0.5rem 0' }}>
-                            <h3 className="card-title">Variantes y precios</h3>
+                            <h3 className="card-title">Presentaciones y precios</h3>
                             {(product.variants ?? []).length === 0 ? (
-                              <p className="page-subtitle">Sin variantes. Agrega precio y stock.</p>
+                              <p className="page-subtitle">
+                                Sin presentaciones. Agrégalas al crear una compra al proveedor.
+                              </p>
                             ) : (
                               <table className="data-table">
                                 <thead>
                                   <tr>
                                     <th>SKU</th>
-                                    <th>Variante</th>
+                                    <th>Presentación</th>
                                     <th>P. venta</th>
                                     <th>P. costo</th>
                                     <th>Stock</th>
@@ -364,125 +258,12 @@ export function ProductsPage() {
                               </table>
                             )}
 
-                            <Can permission={P.Inventory.Create}>
-                              <form
-                                onSubmit={handleAddVariant(product)}
-                                style={{ marginTop: '1rem' }}
-                              >
-                                <h4 className="card-title">Agregar variante / precio</h4>
-                                <div className="page-filters">
-                                  <div className="form-group">
-                                    <label className="form-label">SKU</label>
-                                    <input
-                                      className="form-input"
-                                      required
-                                      value={variantForm.sku}
-                                      onChange={(e) =>
-                                        setVariantForm((f) => ({ ...f, sku: e.target.value }))
-                                      }
-                                    />
-                                  </div>
-                                  <div className="form-group">
-                                    <label className="form-label">Nombre variante</label>
-                                    <input
-                                      className="form-input"
-                                      required
-                                      value={variantForm.variantName}
-                                      onChange={(e) =>
-                                        setVariantForm((f) => ({
-                                          ...f,
-                                          variantName: e.target.value,
-                                        }))
-                                      }
-                                    />
-                                  </div>
-                                  <div className="form-group">
-                                    <label className="form-label">Precio venta</label>
-                                    <input
-                                      type="number"
-                                      min={0}
-                                      step="0.01"
-                                      className="form-input"
-                                      required
-                                      value={variantForm.salePrice}
-                                      onChange={(e) =>
-                                        setVariantForm((f) => ({
-                                          ...f,
-                                          salePrice: e.target.value,
-                                        }))
-                                      }
-                                    />
-                                  </div>
-                                  <div className="form-group">
-                                    <label className="form-label">Precio costo</label>
-                                    <input
-                                      type="number"
-                                      min={0}
-                                      step="0.01"
-                                      className="form-input"
-                                      required
-                                      value={variantForm.costPrice}
-                                      onChange={(e) =>
-                                        setVariantForm((f) => ({
-                                          ...f,
-                                          costPrice: e.target.value,
-                                        }))
-                                      }
-                                    />
-                                  </div>
-                                  <div className="form-group">
-                                    <label className="form-label">Stock</label>
-                                    <input
-                                      type="number"
-                                      min={0}
-                                      className="form-input"
-                                      value={variantForm.stockOnHand}
-                                      onChange={(e) =>
-                                        setVariantForm((f) => ({
-                                          ...f,
-                                          stockOnHand: e.target.value,
-                                        }))
-                                      }
-                                    />
-                                  </div>
-                                  <div className="form-group">
-                                    <label className="form-label">Stock mínimo</label>
-                                    <input
-                                      type="number"
-                                      min={0}
-                                      className="form-input"
-                                      value={variantForm.reorderLevel}
-                                      onChange={(e) =>
-                                        setVariantForm((f) => ({
-                                          ...f,
-                                          reorderLevel: e.target.value,
-                                        }))
-                                      }
-                                    />
-                                  </div>
-                                  <div className="form-group">
-                                    <label className="form-label">Código barras</label>
-                                    <input
-                                      className="form-input"
-                                      value={variantForm.barcode}
-                                      onChange={(e) =>
-                                        setVariantForm((f) => ({
-                                          ...f,
-                                          barcode: e.target.value,
-                                        }))
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <button
-                                  type="submit"
-                                  className="btn btn-primary"
-                                  disabled={variantMutation.isPending}
-                                >
-                                  Guardar variante
-                                </button>
-                              </form>
-                            </Can>
+                            <p className="page-subtitle" style={{ marginTop: '1rem' }}>
+                              Para agregar una presentación o SKU nuevo, use{' '}
+                              <Link to="/compras">Compras → Nueva orden</Link> (producto nuevo o
+                              nueva presentación de un producto existente). Primero registre la
+                              compra al proveedor.
+                            </p>
                           </div>
                         </td>
                       </tr>

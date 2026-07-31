@@ -15,6 +15,7 @@ import { ReportsPage } from '../pages/(admin)/reports/ReportsPage'
 import { PosPage } from '../pages/(admin)/sales/PosPage'
 import { SalesHistoryPage } from '../pages/(admin)/sales/SalesHistoryPage'
 import { SettingsPage } from '../pages/(admin)/settings/SettingsPage'
+import { TraceabilityPage } from '../pages/(admin)/traceability/TraceabilityPage'
 import { UsersPage } from '../pages/(admin)/users/UsersPage'
 import { LoginPage } from '../pages/(public)/LoginPage'
 import { CartPage } from '../pages/(public)/store/CartPage'
@@ -72,6 +73,7 @@ export function AppRouter() {
         <Route path="clientes" element={<CustomersPage />} />
         <Route path="compras" element={<PurchasesPage />} />
         <Route path="reportes" element={<ReportsPage />} />
+        <Route path="trazabilidad" element={<TraceabilityPage />} />
         <Route path="notificaciones" element={<NotificationsPage />} />
         <Route path="faq" element={<FaqAdminPage />} />
         <Route path="auditoria" element={<AuditPage />} />
@@ -95,6 +97,7 @@ export function AppRouter() {
         <Route path="clientes" element={<CustomersPage />} />
         <Route path="compras" element={<PurchasesPage />} />
         <Route path="reportes" element={<ReportsPage />} />
+        <Route path="trazabilidad" element={<TraceabilityPage />} />
         <Route path="notificaciones" element={<NotificationsPage />} />
         <Route path="faq" element={<FaqAdminPage />} />
         <Route path="auditoria" element={<AuditPage />} />

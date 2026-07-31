@@ -110,6 +110,22 @@ export interface FaqSearchResult {
   categoryName?: string
 }
 
+export interface FaqProductCard {
+  productId: number
+  productVariantId: number
+  productName: string
+  variantName: string
+  sku: string
+  price: number
+  stockOnHand: number
+  imageUrl?: string | null
+}
+
+export interface FaqAskResult {
+  articles: FaqSearchResult[]
+  products: FaqProductCard[]
+}
+
 export interface TypeaheadItem {
   id: number
   label: string

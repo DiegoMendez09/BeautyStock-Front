@@ -14,16 +14,30 @@ function formatPrice(value: number): string {
   }).format(value)
 }
 
+function statusBadge(status: string) {
+  if (status === 'Completed') return 'badge badge-success'
+  return 'badge badge-muted'
+}
+
 export function SalesHistoryPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
+  const [appliedFrom, setAppliedFrom] = useState('')
+  const [appliedTo, setAppliedTo] = useState('')
   const [exportError, setExportError] = useState('')
+  const [pdfError, setPdfError] = useState('')
 
   const { data, isLoading, isError, isFetching } = useQuery({
-    queryKey: ['sales', 'list', { page, pageSize }],
-    queryFn: () => getSales({ page, pageSize }),
+    queryKey: ['sales', 'list', { page, pageSize, from: appliedFrom, to: appliedTo }],
+    queryFn: () =>
+      getSales({
+        page,
+        pageSize,
+        from: appliedFrom || undefined,
+        to: appliedTo || undefined,
+      }),
     placeholderData: keepPreviousData,
   })
   const sales = data?.items ?? []
@@ -31,6 +45,10 @@ export function SalesHistoryPage() {
   const pdfMutation = useMutation({
     mutationFn: ({ saleId, ticketNumber }: { saleId: number; ticketNumber: string }) =>
       downloadSalePdf(saleId, ticketNumber),
+    onMutate: () => setPdfError(''),
+    onError: (err) => {
+      setPdfError(err instanceof Error ? err.message : 'No se pudo descargar el ticket PDF')
+    },
   })
 
   const exportMutation = useMutation({
@@ -49,59 +67,92 @@ export function SalesHistoryPage() {
     onMutate: () => setExportError(''),
   })
 
+  const applyFilters = () => {
+    setAppliedFrom(fromDate)
+    setAppliedTo(toDate)
+    setPage(1)
+  }
+
+  const clearFilters = () => {
+    setFromDate('')
+    setToDate('')
+    setAppliedFrom('')
+    setAppliedTo('')
+    setPage(1)
+  }
+
   return (
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">Historial de ventas</h1>
-        <p className="page-subtitle">Tickets registrados en el POS</p>
+        <p className="page-subtitle">
+          Consulta tickets del POS, filtra por fechas y descarga PDF individual o consolidado
+        </p>
       </header>
 
       {isError && <div className="alert alert-error">No se pudieron cargar las ventas</div>}
       {exportError && <div className="alert alert-error">{exportError}</div>}
+      {pdfError && <div className="alert alert-error">{pdfError}</div>}
 
-      <Can permission={P.Sales.View}>
-        <div className="card" style={{ marginBottom: '1.25rem' }}>
-          <h2 className="card-title">Exportar historial</h2>
-          <p className="page-subtitle" style={{ marginBottom: '0.75rem' }}>
-            Las fechas son opcionales: sin fechas exporta todo; puedes usar solo desde, solo hasta, o ambas.
-          </p>
-          <div className="page-filters">
-            <div className="form-group">
-              <label className="form-label">Desde (opcional)</label>
-              <input
-                type="date"
-                className="form-input"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Hasta (opcional)</label>
-              <input
-                type="date"
-                className="form-input"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-              />
-            </div>
+      <div className="card" style={{ marginBottom: '1.25rem' }}>
+        <h2 className="card-title">Filtros y descargas</h2>
+        <p className="page-subtitle" style={{ marginBottom: '0.75rem' }}>
+          Usa las fechas para filtrar la lista. La exportación PDF usa el mismo rango (opcional).
+        </p>
+        <div className="page-filters">
+          <div className="form-group">
+            <label className="form-label">Desde</label>
+            <input
+              type="date"
+              className="form-input"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+            />
           </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            disabled={exportMutation.isPending}
-            onClick={() => exportMutation.mutate()}
-          >
-            {exportMutation.isPending ? 'Generando…' : 'Exportar PDF'}
-          </button>
+          <div className="form-group">
+            <label className="form-label">Hasta</label>
+            <input
+              type="date"
+              className="form-input"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+            />
+          </div>
         </div>
-      </Can>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', marginTop: '0.75rem' }}>
+          <button type="button" className="btn btn-secondary" onClick={applyFilters}>
+            Filtrar lista
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={clearFilters}>
+            Limpiar
+          </button>
+          <Can anyOf={[P.Sales.View, P.Sales.Export]}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={exportMutation.isPending}
+              onClick={() => exportMutation.mutate()}
+            >
+              {exportMutation.isPending ? 'Generando…' : 'Descargar historial PDF'}
+            </button>
+          </Can>
+        </div>
+        {(appliedFrom || appliedTo) && (
+          <p className="page-subtitle" style={{ marginTop: '0.75rem' }}>
+            Lista filtrada
+            {appliedFrom ? ` desde ${appliedFrom}` : ''}
+            {appliedTo ? ` hasta ${appliedTo}` : ''}
+            {data ? ` · ${data.totalCount} venta(s)` : ''}
+          </p>
+        )}
+      </div>
 
       {isLoading ? (
         <div className="loading-screen" style={{ minHeight: 160 }}>
           <div className="spinner" />
         </div>
       ) : sales.length === 0 ? (
-        <div className="empty-state">No hay ventas registradas</div>
+        <div className="empty-state">No hay ventas registradas en este rango</div>
       ) : (
         <>
           <div className="table-wrapper">
@@ -114,7 +165,7 @@ export function SalesHistoryPage() {
                   <th>Pago</th>
                   <th>Total</th>
                   <th>Estado</th>
-                  <th />
+                  <th>Descarga</th>
                 </tr>
               </thead>
               <tbody>
@@ -125,12 +176,14 @@ export function SalesHistoryPage() {
                     <td>{sale.soldByFullName}</td>
                     <td>{sale.paymentMethod}</td>
                     <td>{formatPrice(sale.totalAmount)}</td>
-                    <td>{sale.status}</td>
+                    <td>
+                      <span className={statusBadge(sale.status)}>{sale.status}</span>
+                    </td>
                     <td>
                       <Can permission={P.Sales.View}>
                         <button
                           type="button"
-                          className="btn btn-ghost btn-sm"
+                          className="btn btn-secondary btn-sm"
                           disabled={pdfMutation.isPending}
                           onClick={() =>
                             pdfMutation.mutate({
@@ -139,7 +192,7 @@ export function SalesHistoryPage() {
                             })
                           }
                         >
-                          PDF
+                          Descargar ticket
                         </button>
                       </Can>
                     </td>

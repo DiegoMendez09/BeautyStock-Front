@@ -68,7 +68,7 @@ export function FaqAdminPage() {
   })
 
   if (!canManage) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/panel" replace />
   }
 
   const handleCreate = (e: FormEvent) => {

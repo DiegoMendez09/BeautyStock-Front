@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiClientError } from '../../api/client'
+import { PasswordInput } from '../../components/ui/PasswordInput'
 import { useAuth } from '../../hooks/useAuth'
 import './LoginPage.css'
 
@@ -93,21 +94,15 @@ export function LoginPage() {
               />
             </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="password">
-                Contraseña
-              </label>
-              <input
-                id="password"
-                type="password"
-                className="form-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                autoComplete="current-password"
-              />
-            </div>
+            <PasswordInput
+              id="password"
+              label="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              autoComplete="current-password"
+            />
 
             <button type="submit" className="btn btn-primary" disabled={submitting}>
               {submitting ? 'Ingresando...' : 'Ingresar'}
@@ -118,4 +113,3 @@ export function LoginPage() {
     </div>
   )
 }
-

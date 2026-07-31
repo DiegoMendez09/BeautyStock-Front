@@ -81,7 +81,23 @@ export async function getPurchaseOrders(
 export async function createPurchaseOrder(body: {
   supplierId: number
   notes?: string
-  lines: { productVariantId: number; quantity: number; unitCost: number }[]
+  lines: {
+    productVariantId?: number
+    quantity: number
+    unitCost: number
+    newItem?: {
+      productId?: number
+      categoryId?: number
+      brandId?: number
+      productName?: string
+      sku: string
+      presentationName: string
+      presentationValue?: string
+      salePrice: number
+      reorderLevel?: number
+      barcode?: string
+    }
+  }[]
 }): Promise<PurchaseOrder> {
   return apiClient<PurchaseOrder>('/api/v1/purchases/orders', { method: 'POST', body })
 }
@@ -114,6 +130,48 @@ export interface DashboardReport {
 
 export async function getDashboardReport(): Promise<DashboardReport> {
   return apiClient<DashboardReport>('/api/v1/reports/dashboard')
+}
+
+export interface TraceabilityPurchaseRef {
+  purchaseOrderId: number
+  orderNumber: string
+  supplierName: string
+  receivedAt: string
+  quantity: number
+  unitCost: number
+}
+
+export interface TraceabilityItem {
+  productVariantId: number
+  sku: string
+  productName: string
+  variantName: string
+  quantityPurchased: number
+  quantitySold: number
+  stockOnHand: number
+  purchaseBalance: number
+  purchaseCostTotal: number
+  salesRevenueTotal: number
+  suppliers: string[]
+  purchases: TraceabilityPurchaseRef[]
+}
+
+export interface TraceabilityReport {
+  items: TraceabilityItem[]
+  totalPurchased: number
+  totalSold: number
+  totalStockOnHand: number
+}
+
+export async function getTraceabilityReport(params: {
+  productVariantId?: number
+  supplierId?: number
+} = {}): Promise<TraceabilityReport> {
+  const qs = buildQueryString({
+    productVariantId: params.productVariantId,
+    supplierId: params.supplierId,
+  })
+  return apiClient<TraceabilityReport>(`/api/v1/reports/traceability${qs}`)
 }
 
 export async function getSettingsOverview() {

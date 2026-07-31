@@ -8,18 +8,30 @@
   background: var(--color-accent);
   color: var(--color-text-inverse);
   font-family: var(--font-family);
-  font-size: 1.25rem;
-  font-weight: var(--font-weight-bold);
   box-shadow: var(--shadow-md);
   z-index: 200;
   border: none;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
 .faq-widget__toggle:hover {
   background: var(--color-accent-hover);
   transform: translateY(-1px);
+}
+
+.faq-widget__toggle--store {
+  background: var(--color-primary);
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 50;
+}
+
+.faq-widget__toggle--store:hover {
+  background: color-mix(in srgb, var(--color-primary) 88%, black);
 }
 
 .faq-widget__panel {
@@ -39,12 +51,31 @@
   font-family: var(--font-family);
 }
 
+.faq-widget__panel--store {
+  bottom: calc(1.25rem + 4rem);
+  right: 1.25rem;
+  z-index: 50;
+  border-color: color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
+}
+
 .faq-widget__header {
   padding: var(--space-md) var(--space-lg);
   border-bottom: 1px solid var(--color-border);
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--color-accent) 12%, var(--color-surface)),
+    var(--color-surface)
+  );
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.faq-widget__panel--store .faq-widget__header {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)),
     var(--color-surface)
   );
 }
@@ -60,6 +91,23 @@
   margin: 0.15rem 0 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+}
+
+.faq-widget__new {
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  padding: 0.35rem 0.55rem;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.faq-widget__new:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .faq-widget__messages {
@@ -87,6 +135,8 @@
 
 .faq-chat--bot {
   align-self: flex-start;
+  width: 100%;
+  max-width: 100%;
 }
 
 .faq-chat__bubble {
@@ -101,6 +151,10 @@
   background: var(--color-accent);
   color: var(--color-text-inverse);
   border-bottom-right-radius: 0.25rem;
+}
+
+.faq-widget__panel--store .faq-chat--user .faq-chat__bubble {
+  background: var(--color-primary);
 }
 
 .faq-chat--bot .faq-chat__bubble {
@@ -137,6 +191,60 @@
   color: var(--color-accent);
 }
 
+.faq-product-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.faq-product-card__name {
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+}
+
+.faq-product-card__meta,
+.faq-product-card__stock {
+  margin: 0.15rem 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.faq-product-card__price {
+  margin: 0.35rem 0 0;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+}
+
+.faq-product-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.faq-product-card__link {
+  font-size: var(--font-size-sm);
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.faq-widget__panel--store .faq-product-card__link {
+  color: var(--color-primary);
+}
+
+.faq-product-card__add {
+  font-size: var(--font-size-sm);
+  padding: 0.35rem 0.65rem;
+}
+
 .faq-widget__suggestions {
   display: flex;
   flex-wrap: wrap;
@@ -159,6 +267,11 @@
   color: var(--color-accent);
 }
 
+.faq-widget__panel--store .faq-chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .faq-widget__composer {
   display: flex;
   gap: 0.5rem;
@@ -174,4 +287,18 @@
 
 .faq-widget__send {
   flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .faq-widget__panel,
+  .faq-widget__panel--store {
+    width: calc(100vw - 1rem);
+    right: 0.5rem;
+    height: min(70vh, 520px);
+  }
+
+  .faq-widget__toggle--store {
+    right: 0.75rem;
+    bottom: 0.75rem;
+  }
 }
