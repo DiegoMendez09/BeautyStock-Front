@@ -342,7 +342,7 @@ export function MarketplacePage() {
                         {priceLabel(product)}
                       </Link>
                       <p className="ml-card__ship">
-                        {product.totalStock > 5 ? 'Stock disponible' : 'Últimas unidades'}
+                        {product.totalStock > 5 ? 'Disponible' : 'Últimas unidades'}
                       </p>
                       <Link
                         to={`/tienda/producto/${product.productId}`}

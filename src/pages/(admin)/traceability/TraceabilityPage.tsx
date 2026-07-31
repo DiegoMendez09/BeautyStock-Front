@@ -50,7 +50,7 @@ export function TraceabilityPage() {
       <header className="page-header">
         <h1 className="page-title">Trazabilidad compra → venta</h1>
         <p className="page-subtitle">
-          Qué se compró a proveedores, qué queda en stock y qué se vendió (por variante)
+          Qué se compró a proveedores, qué queda en existencias y qué se vendió (por presentación)
         </p>
       </header>
 
@@ -64,7 +64,7 @@ export function TraceabilityPage() {
           <div className="kpi-value">{data?.totalSold ?? '—'}</div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-label">Stock actual</div>
+          <div className="kpi-label">Existencias actuales</div>
           <div className="kpi-value">{data?.totalStockOnHand ?? '—'}</div>
         </div>
       </div>
@@ -74,7 +74,7 @@ export function TraceabilityPage() {
         <div className="page-filters">
           <TypeaheadInput
             entity="product-variants"
-            label="Variante (opcional)"
+            label="Presentación (opcional)"
             minLength={1}
             valueLabel={variantLabel}
             onSelect={(item) => {
@@ -137,7 +137,7 @@ export function TraceabilityPage() {
                 <th>SKU</th>
                 <th>Comprado</th>
                 <th>Vendido</th>
-                <th>Stock</th>
+                <th>Existencias</th>
                 <th>Saldo compra</th>
                 <th>Costo compras</th>
                 <th>Ingresos ventas</th>
@@ -190,7 +190,7 @@ export function TraceabilityPage() {
                         >
                           {(item.purchases?.length ?? 0) === 0 ? (
                             <p className="page-subtitle">
-                              Sin compras recibidas (puede haber stock por ajuste o ventas
+                              Sin compras recibidas (puede haber existencias por ajuste o ventas
                               históricas).
                             </p>
                           ) : (

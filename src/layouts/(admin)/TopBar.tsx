@@ -1,5 +1,6 @@
 ﻿import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { roleLabel } from '../../lib/labels'
 import './TopBar.css'
 
 function getInitials(name: string): string {
@@ -48,7 +49,7 @@ export function TopBar({ collapsed, onToggleSidebar }: TopBarProps) {
             <div className="topbar__avatar">{getInitials(user.fullName)}</div>
             <div className="topbar__info">
               <span className="topbar__name">{user.fullName}</span>
-              <span className="topbar__role">{user.role}</span>
+              <span className="topbar__role">{roleLabel(user.role)}</span>
             </div>
           </>
         )}
@@ -56,7 +57,7 @@ export function TopBar({ collapsed, onToggleSidebar }: TopBarProps) {
           Tienda
         </Link>
         <button type="button" className="topbar__logout" onClick={handleLogout}>
-          Salir
+          Cerrar sesión
         </button>
       </div>
     </header>

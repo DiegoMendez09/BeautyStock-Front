@@ -4,6 +4,7 @@ import { downloadSalePdf, downloadSalesExportPdf, getSales } from '../../../api/
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
+import { paymentMethodLabel, saleStatusLabel } from '../../../lib/labels'
 import { P } from '../../../lib/permissions'
 
 function formatPrice(value: number): string {
@@ -47,7 +48,7 @@ export function SalesHistoryPage() {
       downloadSalePdf(saleId, ticketNumber),
     onMutate: () => setPdfError(''),
     onError: (err) => {
-      setPdfError(err instanceof Error ? err.message : 'No se pudo descargar el ticket PDF')
+      setPdfError(err instanceof Error ? err.message : 'No se pudo descargar el comprobante PDF')
     },
   })
 
@@ -86,7 +87,8 @@ export function SalesHistoryPage() {
       <header className="page-header">
         <h1 className="page-title">Historial de ventas</h1>
         <p className="page-subtitle">
-          Consulta tickets del POS, filtra por fechas y descarga PDF individual o consolidado
+          Consulta comprobantes del punto de venta, filtra por fechas y descarga PDF individual o
+          consolidado
         </p>
       </header>
 
@@ -159,7 +161,7 @@ export function SalesHistoryPage() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Ticket</th>
+                  <th>Comprobante</th>
                   <th>Fecha</th>
                   <th>Vendedor</th>
                   <th>Pago</th>
@@ -174,10 +176,12 @@ export function SalesHistoryPage() {
                     <td>{sale.ticketNumber}</td>
                     <td>{new Date(sale.soldAt).toLocaleString('es-PE')}</td>
                     <td>{sale.soldByFullName}</td>
-                    <td>{sale.paymentMethod}</td>
+                    <td>{paymentMethodLabel(sale.paymentMethod)}</td>
                     <td>{formatPrice(sale.totalAmount)}</td>
                     <td>
-                      <span className={statusBadge(sale.status)}>{sale.status}</span>
+                      <span className={statusBadge(sale.status)}>
+                        {saleStatusLabel(sale.status)}
+                      </span>
                     </td>
                     <td>
                       <Can permission={P.Sales.View}>
@@ -192,7 +196,7 @@ export function SalesHistoryPage() {
                             })
                           }
                         >
-                          Descargar ticket
+                          Descargar comprobante
                         </button>
                       </Can>
                     </td>

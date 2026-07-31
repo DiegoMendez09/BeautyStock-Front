@@ -8,7 +8,7 @@ import { useChatStore, type ChatMessage } from '../../stores/chatStore'
 import type { FaqProductCard } from '../../types'
 import './FaqWidget.css'
 
-const ADMIN_SUGGESTIONS = ['Cómo inicio sesión', 'stock mínimo', 'registrar una venta']
+const ADMIN_SUGGESTIONS = ['Cómo inicio sesión', 'existencias mínimas', 'registrar una venta']
 const STORE_SUGGESTIONS = ['labial', 'shampoo', 'crema hidratante']
 
 function formatPrice(value: number): string {
@@ -78,7 +78,9 @@ function ProductCards({
             </p>
             <p className="faq-product-card__price">{formatPrice(item.price)}</p>
             <p className="faq-product-card__stock">
-              {item.stockOnHand > 0 ? `Stock: ${item.stockOnHand}` : 'Sin stock'}
+              {item.stockOnHand > 0
+                ? `Existencias: ${item.stockOnHand}`
+                : 'Sin existencias'}
             </p>
           </div>
           <div className="faq-product-card__actions">

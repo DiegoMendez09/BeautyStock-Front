@@ -303,8 +303,8 @@ export function PurchasesPage() {
       <header className="page-header">
         <h1 className="page-title">Compras a proveedores</h1>
         <p className="page-subtitle">
-          Flujo: compra al proveedor → recibes stock de esa presentación/SKU → luego puedes vender.
-          Los productos nuevos se registran aquí, no desde Inventario.
+          Flujo: compra al proveedor → recibes existencias de esa presentación/SKU → luego puedes
+          vender. Los productos nuevos se registran aquí, no desde Inventario.
         </p>
       </header>
 
@@ -435,7 +435,7 @@ export function PurchasesPage() {
                                     disabled={receiveMutation.isPending}
                                     onClick={() => receiveMutation.mutate(order.purchaseOrderId)}
                                   >
-                                    Recibir stock
+                                    Recibir existencias
                                   </button>
                                 )}
                               </Can>
@@ -473,7 +473,7 @@ export function PurchasesPage() {
             <h2 className="card-title">Nueva orden de compra</h2>
             <p className="page-subtitle" style={{ marginBottom: '0.5rem' }}>
               Compras una unidad vendible concreta (producto + presentación + SKU). Al pulsar
-              «Recibir stock» aumenta el inventario de esa unidad. Si el producto aún no existe,
+              «Recibir existencias» aumenta el inventario de esa unidad. Si el producto aún no existe,
               créalo aquí dentro de la línea.
             </p>
             <p className="page-subtitle" style={{ marginBottom: '1rem' }}>

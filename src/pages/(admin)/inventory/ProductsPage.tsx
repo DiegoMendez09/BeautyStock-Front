@@ -70,7 +70,7 @@ export function ProductsPage() {
       <header className="page-header">
         <h1 className="page-title">Productos</h1>
         <p className="page-subtitle">
-          Consulta el catálogo y el stock. Los productos nuevos se dan de alta al comprar al
+          Consulta el catálogo y las existencias. Los productos nuevos se dan de alta al comprar al
           proveedor.
         </p>
       </header>
@@ -80,7 +80,7 @@ export function ProductsPage() {
         <p className="page-subtitle" style={{ marginBottom: '0.75rem' }}>
           Primero registre una compra al proveedor. En Compras → Nueva orden puede elegir una
           presentación ya registrada o crear producto + presentación/SKU en la misma línea. Al
-          recibir la orden entra el stock y ya puede vender.
+          recibir la orden entran las existencias y ya puede vender.
         </p>
         <Can permission={P.Purchases.Create}>
           <Link to="/compras" className="btn btn-primary">
@@ -221,9 +221,9 @@ export function ProductsPage() {
                                     <th>Presentación</th>
                                     <th>P. venta</th>
                                     <th>P. costo</th>
-                                    <th>Stock</th>
+                                    <th>Existencias</th>
                                     <th>Mín.</th>
-                                    <th>Barcode</th>
+                                    <th>Código de barras</th>
                                     <th />
                                   </tr>
                                 </thead>

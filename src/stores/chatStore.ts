@@ -6,7 +6,7 @@ import type { FaqProductCard, FaqSearchResult } from '../types'
 export const CHAT_TTL_MS = 45 * 60 * 1000
 
 export const CHAT_WELCOME =
-  'Hola, soy el asistente de BeautyStock. Pregúntame por productos, precios, stock o dudas del sistema.'
+  'Hola, soy el asistente de BeautyStock. Pregúntame por productos, precios, existencias o dudas del sistema.'
 
 export type ChatMessage =
   | { id: string; role: 'bot' | 'user'; text: string }

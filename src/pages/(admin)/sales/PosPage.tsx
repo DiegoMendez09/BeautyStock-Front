@@ -133,8 +133,8 @@ export function PosPage() {
           <div className="page-filters" style={{ marginBottom: '1rem' }}>
             <TypeaheadInput
               entity="product-variants"
-              label="Buscar variante"
-              placeholder="SKU, nombre o código..."
+              label="Buscar presentación"
+              placeholder="SKU, nombre o código…"
               minLength={1}
               onSelect={(item) => {
                 void (async () => {
@@ -143,7 +143,7 @@ export function PosPage() {
                     const variant = await getProductVariantById(item.id)
                     addVariantToCart(variant)
                   } catch {
-                    setError('No se pudo agregar la variante seleccionada')
+                    setError('No se pudo agregar la presentación seleccionada')
                   }
                 })()
               }}
@@ -151,7 +151,7 @@ export function PosPage() {
             <TypeaheadInput
               entity="customers"
               label="Cliente (opcional)"
-              placeholder="Buscar cliente..."
+              placeholder="Buscar cliente…"
               valueLabel={customerLabel}
               onSelect={(item) => {
                 setCustomerId(item.id)
@@ -177,7 +177,7 @@ export function PosPage() {
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
                 onKeyDown={handleScanKeyDown}
-                placeholder="Escanear o escribir código..."
+                placeholder="Escanear o escribir código…"
                 autoFocus
               />
             </div>
@@ -278,7 +278,7 @@ export function PosPage() {
               disabled={cart.length === 0 || createSaleMutation.isPending}
               onClick={() => void handleCheckout()}
             >
-              {createSaleMutation.isPending ? 'Procesando...' : 'Completar venta'}
+              {createSaleMutation.isPending ? 'Procesando…' : 'Completar venta'}
             </button>
             <button
               type="button"

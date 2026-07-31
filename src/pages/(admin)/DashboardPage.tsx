@@ -39,7 +39,7 @@ export function DashboardPage() {
           <div className="kpi-value">{data?.activeProducts ?? '—'}</div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-label">Stock bajo</div>
+          <div className="kpi-label">Existencias bajas</div>
           <div className="kpi-value">{data?.lowStockItems.length ?? '—'}</div>
         </div>
         <div className="kpi-card">
@@ -51,7 +51,7 @@ export function DashboardPage() {
       <div className="card">
         <h2 className="card-title">Resumen</h2>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9375rem' }}>
-          Usa el menú para productos (precios en variantes), marcas, compras, reportes y más.
+          Usa el menú para productos (precios en presentaciones), marcas, compras, reportes y más.
           Las bajas son lógicas (Desactivar), no eliminan registros de la base.
         </p>
       </div>

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getNotifications, markNotificationRead } from '../../../api/ops'
 import { useInventoryHub } from '../../../hooks/useInventoryHub'
+import { severityLabel } from '../../../lib/labels'
 import { useState } from 'react'
 
 export function NotificationsPage() {
@@ -13,7 +14,7 @@ export function NotificationsPage() {
 
   useInventoryHub({
     onLowStock: (msg) => {
-      setToast(`Stock bajo: ${msg.sku} → ${msg.stockOnHand}`)
+      setToast(`Existencias bajas: ${msg.sku} → ${msg.stockOnHand}`)
     },
   })
 
@@ -26,7 +27,7 @@ export function NotificationsPage() {
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">Notificaciones</h1>
-        <p className="page-subtitle">Alertas de inventario en tiempo real (SignalR)</p>
+        <p className="page-subtitle">Alertas de inventario en tiempo real</p>
       </header>
 
       {toast && <div className="alert alert-success">{toast}</div>}
@@ -56,7 +57,7 @@ export function NotificationsPage() {
                   <td>{new Date(item.createdAt).toLocaleString('es-PE')}</td>
                   <td>{item.title}</td>
                   <td>{item.message}</td>
-                  <td>{item.severity}</td>
+                  <td>{severityLabel(item.severity)}</td>
                   <td>
                     {!item.isRead && (
                       <button

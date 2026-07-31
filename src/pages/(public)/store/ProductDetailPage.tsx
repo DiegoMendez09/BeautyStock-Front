@@ -38,7 +38,7 @@ export function ProductDetailPage() {
 
   const buyNow = useMutation({
     mutationFn: async () => {
-      if (!selected) throw new Error('Sin variante')
+      if (!selected) throw new Error('Sin presentación')
       return createSale({
         paymentMethod: 'Card',
         discountAmount: 0,
@@ -53,7 +53,7 @@ export function ProductDetailPage() {
       })
     },
     onSuccess: (sale) => {
-      setMessage(`Compra realizada. Ticket ${sale.ticketNumber}`)
+      setMessage(`Compra realizada. Comprobante ${sale.ticketNumber}`)
     },
     onError: () => setMessage('No se pudo completar la compra'),
   })
@@ -135,7 +135,11 @@ export function ProductDetailPage() {
               <span>
                 <strong>{formatPrice(variant.salePrice)}</strong>
                 <br />
-                <small>{variant.stockOnHand > 0 ? `${variant.stockOnHand} disp.` : 'Agotado'}</small>
+                <small>
+                  {variant.stockOnHand > 0
+                    ? `${variant.stockOnHand} disponibles`
+                    : 'Agotado'}
+                </small>
               </span>
             </button>
           ))}

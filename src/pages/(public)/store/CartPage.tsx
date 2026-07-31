@@ -43,7 +43,8 @@ export function CartPage() {
       setTicket(sale.ticketNumber)
       setError('')
     },
-    onError: () => setError('No se pudo completar el pedido. Revisa stock e intenta de nuevo.'),
+    onError: () =>
+      setError('No se pudo completar el pedido. Revisa las existencias e intenta de nuevo.'),
   })
 
   const handleCheckout = () => {
@@ -64,7 +65,7 @@ export function CartPage() {
       <div className="card" style={{ maxWidth: 480 }}>
         <h1 className="card-title">¡Compra confirmada!</h1>
         <p style={{ marginBottom: '1rem', color: 'var(--color-text-muted)' }}>
-          Ticket <strong>{ticket}</strong>
+          Comprobante <strong>{ticket}</strong>
         </p>
         <Link to="/tienda" className="btn btn-primary">
           Seguir comprando
@@ -138,7 +139,11 @@ export function CartPage() {
               disabled={checkout.isPending}
               onClick={handleCheckout}
             >
-              {isAuthenticated ? (checkout.isPending ? 'Procesando…' : 'Pagar') : 'Iniciar sesión para pagar'}
+              {isAuthenticated
+                ? checkout.isPending
+                  ? 'Procesando…'
+                  : 'Finalizar compra'
+                : 'Iniciar sesión para pagar'}
             </button>
             <Link to="/tienda" className="btn btn-ghost" style={{ width: '100%', marginTop: 8 }}>
               Seguir comprando

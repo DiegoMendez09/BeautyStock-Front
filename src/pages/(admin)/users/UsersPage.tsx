@@ -7,6 +7,7 @@ import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { PasswordInput } from '../../../components/ui/PasswordInput'
 import { RowActions } from '../../../components/ui/RowActions'
 import { useAuth } from '../../../hooks/useAuth'
+import { roleLabel } from '../../../lib/labels'
 import { P } from '../../../lib/permissions'
 import type { UserAccount } from '../../../types'
 
@@ -123,7 +124,7 @@ export function UsersPage() {
               >
                 {roles.map((role) => (
                   <option key={role} value={role}>
-                    {role}
+                    {roleLabel(role)}
                   </option>
                 ))}
               </select>
@@ -157,7 +158,7 @@ export function UsersPage() {
                   <tr key={user.userAccountId}>
                     <td>{user.fullName}</td>
                     <td>{user.email}</td>
-                    <td>{user.role}</td>
+                    <td>{roleLabel(user.role)}</td>
                     <td>
                       <span className={`badge ${user.isActive ? 'badge-success' : 'badge-muted'}`}>
                         {user.isActive ? 'Activo' : 'Inactivo'}

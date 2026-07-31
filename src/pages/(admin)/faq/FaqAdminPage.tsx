@@ -88,15 +88,17 @@ export function FaqAdminPage() {
   return (
     <div className="page">
       <header className="page-header">
-        <h1 className="page-title">FAQ</h1>
+        <h1 className="page-title">Preguntas frecuentes</h1>
         <p className="page-subtitle">
-          Alta, desactivación y borrado con Faq.Manage.
+          Alta, desactivación y borrado de artículos de ayuda.
         </p>
       </header>
 
-      {isError && <div className="alert alert-error">No se pudo cargar el FAQ</div>}
+      {isError && (
+        <div className="alert alert-error">No se pudieron cargar las preguntas frecuentes</div>
+      )}
       {createMutation.isError && (
-        <div className="alert alert-error">No se pudo crear el artículo FAQ</div>
+        <div className="alert alert-error">No se pudo crear el artículo de ayuda</div>
       )}
 
       <Can permission={P.Faq.Manage}>
@@ -133,7 +135,7 @@ export function FaqAdminPage() {
               <label className="form-label">Rol audiencia (opcional)</label>
               <input
                 className="form-input"
-                placeholder="p. ej. Customer"
+                placeholder="Dejar vacío = todos los roles"
                 value={audienceRole}
                 onChange={(e) => setAudienceRole(e.target.value)}
               />
@@ -162,7 +164,7 @@ export function FaqAdminPage() {
             <label className="form-label">Palabras clave (opcional)</label>
             <input
               className="form-input"
-              placeholder="login sesión acceso"
+              placeholder="iniciar sesión acceso correo"
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
             />
@@ -178,7 +180,7 @@ export function FaqAdminPage() {
           <div className="spinner" />
         </div>
       ) : articles.length === 0 ? (
-        <div className="empty-state">No hay artículos FAQ</div>
+        <div className="empty-state">No hay artículos de ayuda</div>
       ) : (
         <>
           <div className="table-wrapper">

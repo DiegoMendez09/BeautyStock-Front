@@ -51,7 +51,7 @@ export function BrandsPage() {
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">Marcas</h1>
-        <p className="page-subtitle">Catálogo de marcas (Catalog.Create / Delete → desactivar)</p>
+        <p className="page-subtitle">Catálogo de marcas</p>
       </header>
 
       {isError && <div className="alert alert-error">No se pudieron cargar las marcas</div>}

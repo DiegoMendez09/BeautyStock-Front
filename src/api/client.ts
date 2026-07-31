@@ -14,6 +14,44 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown
 }
 
+function spanishStatusFallback(status: number): string {
+  switch (status) {
+    case 400:
+      return 'Solicitud no válida'
+    case 401:
+      return 'Debes iniciar sesión'
+    case 403:
+      return 'No tienes permiso'
+    case 404:
+      return 'No encontrado'
+    case 409:
+      return 'Conflicto con el estado actual'
+    case 422:
+      return 'Datos no válidos'
+    case 500:
+      return 'Error interno del servidor'
+    default:
+      return 'No se pudo completar la solicitud'
+  }
+}
+
+async function readErrorMessage(response: Response): Promise<string> {
+  try {
+    const errorBody = (await response.json()) as {
+      message?: string
+      error?: string
+      detail?: string
+      title?: string
+    }
+    const fromBody =
+      errorBody.message ?? errorBody.error ?? errorBody.detail ?? errorBody.title
+    if (fromBody && fromBody.trim()) return fromBody.trim()
+  } catch {
+    // ignore parse errors
+  }
+  return spanishStatusFallback(response.status)
+}
+
 export async function apiClient<T>(
   path: string,
   options: RequestOptions = {},
@@ -45,14 +83,7 @@ export async function apiClient<T>(
   }
 
   if (!response.ok) {
-    let message = response.statusText
-    try {
-      const errorBody = (await response.json()) as { message?: string; title?: string }
-      message = errorBody.message ?? errorBody.title ?? message
-    } catch {
-      // ignore
-    }
-    throw new ApiClientError(message, response.status)
+    throw new ApiClientError(await readErrorMessage(response), response.status)
   }
 
   if (response.status === 204) {
@@ -78,18 +109,13 @@ export async function downloadBlob(path: string, filename: string): Promise<void
   }
 
   if (!response.ok) {
-    let message = response.statusText
+    let message: string
     if (response.status === 403) {
       message = 'No tienes permiso para exportar este PDF.'
     } else if (response.status === 401) {
       message = 'Sesión expirada. Vuelve a iniciar sesión.'
     } else {
-      try {
-        const errorBody = (await response.json()) as { message?: string; title?: string }
-        message = errorBody.message ?? errorBody.title ?? message
-      } catch {
-        // ignore
-      }
+      message = await readErrorMessage(response)
     }
     throw new ApiClientError(message, response.status)
   }

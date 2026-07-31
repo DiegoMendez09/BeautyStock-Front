@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getSettingsOverview } from '../../../api/modules'
+import { roleLabel } from '../../../lib/labels'
 
 export function SettingsPage() {
   const { data, isLoading, isError } = useQuery({
@@ -11,12 +12,12 @@ export function SettingsPage() {
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">Configuración</h1>
-        <p className="page-subtitle">Módulos, permisos y matriz RBAC (solo SuperAdmin)</p>
+        <p className="page-subtitle">Módulos, permisos y matriz de roles (solo superadministrador)</p>
       </header>
 
       {isError && (
         <div className="alert alert-error">
-          No se pudo cargar la configuración (requiere Settings.Manage)
+          No se pudo cargar la configuración (se requiere permiso de administración)
         </div>
       )}
 
@@ -28,7 +29,7 @@ export function SettingsPage() {
         <>
           <div className="card" style={{ marginBottom: '1rem' }}>
             <h2 className="card-title">Roles</h2>
-            <p>{data.roles.join(' · ')}</p>
+            <p>{data.roles.map(roleLabel).join(' · ')}</p>
           </div>
 
           <div className="card" style={{ marginBottom: '1rem' }}>
@@ -67,7 +68,7 @@ export function SettingsPage() {
               <tbody>
                 {data.rolePermissions.slice(0, 80).map((rp, i) => (
                   <tr key={`${rp.role}-${rp.permissionCode}-${i}`}>
-                    <td>{rp.role}</td>
+                    <td>{roleLabel(rp.role)}</td>
                     <td>{rp.permissionCode}</td>
                   </tr>
                 ))}

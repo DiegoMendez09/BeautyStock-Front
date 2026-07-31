@@ -23,7 +23,7 @@ function expandMenu(menu: ModuleMenuItem[]): ModuleMenuItem[] {
     }
     if (item.code === 'Sales') {
       return [
-        { ...item, name: 'POS', routePath: '/ventas/pos', iconKey: 'pos' },
+        { ...item, name: 'Punto de venta', routePath: '/ventas/pos', iconKey: 'pos' },
         {
           ...item,
           moduleId: item.moduleId * 100 + 2,

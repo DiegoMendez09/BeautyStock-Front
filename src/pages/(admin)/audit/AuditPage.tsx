@@ -39,7 +39,7 @@ export function AuditPage() {
                   <td>{log.emailAttempted}</td>
                   <td>
                     <span className={`badge ${log.isSuccess ? 'badge-success' : 'badge-muted'}`}>
-                      {log.isSuccess ? 'OK' : 'Fallido'}
+                      {log.isSuccess ? 'Correcto' : 'Fallido'}
                     </span>
                   </td>
                   <td>{log.failureReason ?? '—'}</td>

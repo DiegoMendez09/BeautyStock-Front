@@ -62,7 +62,7 @@ export function LoginPage() {
             Inventario inteligente para tu tienda de belleza
           </p>
           <ul className="login-page__features">
-            <li>Control de stock en tiempo real</li>
+            <li>Control de inventario en tiempo real</li>
             <li>Punto de venta integrado</li>
             <li>Reportes y auditoría</li>
           </ul>
@@ -105,7 +105,7 @@ export function LoginPage() {
             />
 
             <button type="submit" className="btn btn-primary" disabled={submitting}>
-              {submitting ? 'Ingresando...' : 'Ingresar'}
+              {submitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
             </button>
           </form>
         </div>

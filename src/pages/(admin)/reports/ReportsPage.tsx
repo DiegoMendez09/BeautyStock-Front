@@ -33,7 +33,7 @@ export function ReportsPage() {
           <div className="page-filters">
             <div className="card">
               <h2 className="card-title">Ventas hoy</h2>
-              <p>{data.salesCountToday} tickets</p>
+              <p>{data.salesCountToday} comprobantes</p>
               <p>{formatPrice(data.salesTotalToday)}</p>
             </div>
             <div className="card">
@@ -47,7 +47,7 @@ export function ReportsPage() {
           </div>
 
           <div className="card" style={{ marginBottom: '1rem' }}>
-            <h2 className="card-title">Stock bajo</h2>
+            <h2 className="card-title">Existencias bajas</h2>
             {data.lowStockItems.length === 0 ? (
               <p className="page-subtitle">Sin alertas</p>
             ) : (
@@ -56,7 +56,7 @@ export function ReportsPage() {
                   <tr>
                     <th>SKU</th>
                     <th>Producto</th>
-                    <th>Stock</th>
+                    <th>Existencias</th>
                     <th>Mín.</th>
                   </tr>
                 </thead>

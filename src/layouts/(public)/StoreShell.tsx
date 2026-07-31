@@ -77,7 +77,7 @@ export function StoreShell() {
               </>
             ) : (
               <Link to="/login" className="ml-header__user">
-                Ingresar
+                Iniciar sesión
               </Link>
             )}
           </nav>
