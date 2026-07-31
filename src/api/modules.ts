@@ -1,4 +1,7 @@
 import { apiClient } from './client'
+import { buildQueryString } from '../lib/queryParams'
+import type { PageParams } from './pagination'
+import type { PagedResult } from '../types'
 
 export interface Supplier {
   supplierId: number
@@ -29,8 +32,17 @@ export interface PurchaseOrder {
   }[]
 }
 
-export async function getSuppliers(): Promise<Supplier[]> {
-  return apiClient<Supplier[]>('/api/v1/purchases/suppliers')
+export interface SupplierListParams extends PageParams {
+  isActive?: boolean
+}
+
+export async function getSuppliers(params: SupplierListParams = {}): Promise<PagedResult<Supplier>> {
+  const qs = buildQueryString({
+    isActive: params.isActive,
+    page: params.page,
+    pageSize: params.pageSize,
+  })
+  return apiClient<PagedResult<Supplier>>(`/api/v1/purchases/suppliers${qs}`)
 }
 
 export async function createSupplier(body: {
@@ -41,12 +53,29 @@ export async function createSupplier(body: {
   return apiClient<Supplier>('/api/v1/purchases/suppliers', { method: 'POST', body })
 }
 
+/** Baja lógica (IsActive = false). */
 export async function deactivateSupplier(id: number): Promise<void> {
+  await apiClient<void>(`/api/v1/purchases/suppliers/${id}/deactivate`, { method: 'POST' })
+}
+
+/** Baja física (borrado permanente). */
+export async function deleteSupplier(id: number): Promise<void> {
   await apiClient<void>(`/api/v1/purchases/suppliers/${id}`, { method: 'DELETE' })
 }
 
-export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
-  return apiClient<PurchaseOrder[]>('/api/v1/purchases/orders')
+export interface PurchaseOrderListParams extends PageParams {
+  status?: string
+}
+
+export async function getPurchaseOrders(
+  params: PurchaseOrderListParams = {},
+): Promise<PagedResult<PurchaseOrder>> {
+  const qs = buildQueryString({
+    status: params.status,
+    page: params.page,
+    pageSize: params.pageSize,
+  })
+  return apiClient<PagedResult<PurchaseOrder>>(`/api/v1/purchases/orders${qs}`)
 }
 
 export async function createPurchaseOrder(body: {
@@ -96,20 +125,6 @@ export async function getSettingsOverview() {
   }>('/api/v1/settings/overview')
 }
 
-export async function getSales() {
-  return apiClient<
-    {
-      saleId: number
-      ticketNumber: string
-      soldAt: string
-      soldByFullName: string
-      totalAmount: number
-      paymentMethod: string
-      status: string
-    }[]
-  >('/api/v1/sales')
-}
-
 export interface FaqCategory {
   faqCategoryId: number
   code: string
@@ -146,9 +161,19 @@ export async function getFaqCategories(): Promise<FaqCategory[]> {
   return apiClient<FaqCategory[]>('/api/v1/faq/categories')
 }
 
-export async function getFaqArticles(includeInactive = false): Promise<FaqArticleAdmin[]> {
-  const q = includeInactive ? '?includeInactive=true' : ''
-  return apiClient<FaqArticleAdmin[]>(`/api/v1/faq/articles${q}`)
+export interface FaqArticleListParams extends PageParams {
+  includeInactive?: boolean
+}
+
+export async function getFaqArticles(
+  params: FaqArticleListParams = {},
+): Promise<PagedResult<FaqArticleAdmin>> {
+  const qs = buildQueryString({
+    includeInactive: params.includeInactive,
+    page: params.page,
+    pageSize: params.pageSize,
+  })
+  return apiClient<PagedResult<FaqArticleAdmin>>(`/api/v1/faq/articles${qs}`)
 }
 
 export async function createFaqArticle(body: CreateFaqArticleRequest): Promise<FaqArticleAdmin> {
@@ -162,6 +187,12 @@ export async function updateFaqArticle(
   return apiClient<FaqArticleAdmin>(`/api/v1/faq/articles/${id}`, { method: 'PUT', body })
 }
 
+/** Baja lógica (IsActive = false). */
 export async function deactivateFaqArticle(id: number): Promise<void> {
+  await apiClient<void>(`/api/v1/faq/articles/${id}/deactivate`, { method: 'POST' })
+}
+
+/** Baja física (borrado permanente). */
+export async function deleteFaqArticle(id: number): Promise<void> {
   await apiClient<void>(`/api/v1/faq/articles/${id}`, { method: 'DELETE' })
 }

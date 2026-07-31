@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getCategories, getProducts, type ProductListParams } from '../api/catalog'
+import { getCategories, getProducts, type CategoryListParams, type ProductListParams } from '../api/catalog'
 import { queryKeys } from '../lib/queryClient'
 import { useDebouncedValue } from './useTypeaheadQuery'
 
@@ -16,9 +16,9 @@ export function useProductsQuery(filters: ProductListParams = {}) {
   })
 }
 
-export function useCategoriesQuery() {
+export function useCategoriesQuery(params: CategoryListParams = {}) {
   return useQuery({
-    queryKey: queryKeys.categories,
-    queryFn: getCategories,
+    queryKey: queryKeys.categories(params),
+    queryFn: () => getCategories(params),
   })
 }

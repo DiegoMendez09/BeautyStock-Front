@@ -55,15 +55,33 @@ function expandMenu(menu: ModuleMenuItem[]): ModuleMenuItem[] {
   })
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean
+  onToggle: () => void
+}
+
+export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { menu } = useAuth()
   const items = expandMenu(menu)
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${collapsed ? ' sidebar--collapsed' : ''}`}>
       <div className="sidebar__brand">
-        <div className="sidebar__logo">BeautyStock</div>
-        <div className="sidebar__tagline">Inventario de belleza</div>
+        <button
+          type="button"
+          className="sidebar__toggle"
+          onClick={onToggle}
+          aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+          title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+        >
+          ☰
+        </button>
+        {!collapsed && (
+          <div className="sidebar__brand-text">
+            <div className="sidebar__logo">BeautyStock</div>
+            <div className="sidebar__tagline">Inventario de belleza</div>
+          </div>
+        )}
       </div>
       <nav className="sidebar__nav">
         {items.map((item) => (
@@ -71,12 +89,13 @@ export function Sidebar() {
             key={`${item.moduleId}-${item.routePath}`}
             to={item.routePath}
             end={item.routePath === '/'}
+            title={collapsed ? item.name : undefined}
             className={({ isActive }) =>
               `sidebar__link${isActive ? ' sidebar__link--active' : ''}`
             }
           >
             <span className="sidebar__icon">{getIcon(item.iconKey)}</span>
-            {item.name}
+            {!collapsed && <span className="sidebar__label">{item.name}</span>}
           </NavLink>
         ))}
       </nav>

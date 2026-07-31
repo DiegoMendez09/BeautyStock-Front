@@ -1,22 +1,31 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
-import { createBrand, deactivateBrand, getBrands } from '../../api/catalogMutations'
+import { getBrands } from '../../api/catalog'
+import { createBrand, deactivateBrand, deleteBrand } from '../../api/catalogMutations'
+import { DEFAULT_PAGE_SIZE } from '../../api/pagination'
 import { Can } from '../../components/auth/Can'
+import { PaginationBar } from '../../components/ui/PaginationBar'
+import { RowActions } from '../../components/ui/RowActions'
 import { P } from '../../lib/permissions'
 
 export function BrandsPage() {
   const queryClient = useQueryClient()
-  const { data: brands = [], isLoading, isError } = useQuery({
-    queryKey: ['catalog', 'brands'],
-    queryFn: getBrands,
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['catalog', 'brands', { page, pageSize }],
+    queryFn: () => getBrands({ page, pageSize }),
   })
+  const brands = data?.items ?? []
   const [name, setName] = useState('')
   const [country, setCountry] = useState('')
+
+  const invalidate = () => void queryClient.invalidateQueries({ queryKey: ['catalog', 'brands'] })
 
   const createMutation = useMutation({
     mutationFn: createBrand,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['catalog', 'brands'] })
+      invalidate()
       setName('')
       setCountry('')
     },
@@ -24,7 +33,12 @@ export function BrandsPage() {
 
   const deactivateMutation = useMutation({
     mutationFn: deactivateBrand,
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['catalog', 'brands'] }),
+    onSuccess: invalidate,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteBrand,
+    onSuccess: invalidate,
   })
 
   const handleCreate = (e: FormEvent) => {
@@ -74,44 +88,57 @@ export function BrandsPage() {
           <div className="spinner" />
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>País</th>
-                <th>Estado</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {brands.map((brand) => (
-                <tr key={brand.brandId}>
-                  <td>{brand.name}</td>
-                  <td>{brand.countryOfOrigin ?? '—'}</td>
-                  <td>
-                    <span className={`badge ${brand.isActive ? 'badge-success' : 'badge-muted'}`}>
-                      {brand.isActive ? 'Activa' : 'Inactiva'}
-                    </span>
-                  </td>
-                  <td>
-                    <Can permission={P.Catalog.Delete}>
-                      {brand.isActive && (
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => deactivateMutation.mutate(brand.brandId)}
-                        >
-                          Desactivar
-                        </button>
-                      )}
-                    </Can>
-                  </td>
+        <>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>País</th>
+                  <th>Estado</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {brands.map((brand) => (
+                  <tr key={brand.brandId}>
+                    <td>{brand.name}</td>
+                    <td>{brand.countryOfOrigin ?? '—'}</td>
+                    <td>
+                      <span className={`badge ${brand.isActive ? 'badge-success' : 'badge-muted'}`}>
+                        {brand.isActive ? 'Activa' : 'Inactiva'}
+                      </span>
+                    </td>
+                    <td>
+                      <Can permission={P.Catalog.Delete}>
+                        <RowActions
+                          isActive={brand.isActive}
+                          onDeactivate={() => deactivateMutation.mutate(brand.brandId)}
+                          onDelete={() => deleteMutation.mutate(brand.brandId)}
+                          deactivatePending={deactivateMutation.isPending}
+                          deletePending={deleteMutation.isPending}
+                        />
+                      </Can>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {data && (
+            <PaginationBar
+              page={data.page}
+              pageSize={data.pageSize}
+              totalCount={data.totalCount}
+              totalPages={data.totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size)
+                setPage(1)
+              }}
+            />
+          )}
+        </>
       )}
     </div>
   )

@@ -1,18 +1,21 @@
 import { Outlet } from 'react-router-dom'
 import { FaqWidget } from '../faq/FaqWidget'
 import { useInventoryHub } from '../../hooks/useInventoryHub'
+import { useSidebarCollapsed } from '../../hooks/useSidebarCollapsed'
 import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
 import './AppShell.css'
 
 export function AppShell() {
   useInventoryHub()
+  const [collapsed, setCollapsed] = useSidebarCollapsed()
+  const toggleSidebar = () => setCollapsed((prev) => !prev)
 
   return (
-    <div className="app-shell">
-      <Sidebar />
+    <div className={`app-shell${collapsed ? ' app-shell--collapsed' : ''}`}>
+      <Sidebar collapsed={collapsed} onToggle={toggleSidebar} />
       <div className="app-shell__main">
-        <TopBar />
+        <TopBar collapsed={collapsed} onToggleSidebar={toggleSidebar} />
         <main className="app-shell__content">
           <Outlet />
         </main>

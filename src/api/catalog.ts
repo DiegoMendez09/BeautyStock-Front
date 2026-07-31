@@ -1,30 +1,53 @@
 import { apiClient } from './client'
 import { buildQueryString, sanitizeSearchInput } from '../lib/queryParams'
-import type { Brand, Category, Product, ProductVariant } from '../types'
+import type { PageParams } from './pagination'
+import type { Brand, Category, PagedResult, Product, ProductVariant } from '../types'
 
-export interface ProductListParams {
+export interface ProductListParams extends PageParams {
   search?: string
   categoryId?: number
   brandId?: number
   isActive?: boolean
 }
 
-export async function getCategories(): Promise<Category[]> {
-  return apiClient<Category[]>('/api/v1/categories')
+export interface CategoryListParams extends PageParams {
+  isActive?: boolean
 }
 
-export async function getBrands(): Promise<Brand[]> {
-  return apiClient<Brand[]>('/api/v1/brands')
+export interface BrandListParams extends PageParams {
+  isActive?: boolean
 }
 
-export async function getProducts(params: ProductListParams = {}): Promise<Product[]> {
+export async function getCategories(
+  params: CategoryListParams = {},
+): Promise<PagedResult<Category>> {
+  const qs = buildQueryString({
+    isActive: params.isActive,
+    page: params.page,
+    pageSize: params.pageSize,
+  })
+  return apiClient<PagedResult<Category>>(`/api/v1/categories${qs}`)
+}
+
+export async function getBrands(params: BrandListParams = {}): Promise<PagedResult<Brand>> {
+  const qs = buildQueryString({
+    isActive: params.isActive,
+    page: params.page,
+    pageSize: params.pageSize,
+  })
+  return apiClient<PagedResult<Brand>>(`/api/v1/brands${qs}`)
+}
+
+export async function getProducts(params: ProductListParams = {}): Promise<PagedResult<Product>> {
   const qs = buildQueryString({
     search: params.search ? sanitizeSearchInput(params.search) : undefined,
     categoryId: params.categoryId,
     brandId: params.brandId,
     isActive: params.isActive,
+    page: params.page,
+    pageSize: params.pageSize,
   })
-  return apiClient<Product[]>(`/api/v1/products${qs}`)
+  return apiClient<PagedResult<Product>>(`/api/v1/products${qs}`)
 }
 
 export async function getProductVariantById(id: number): Promise<ProductVariant> {

@@ -17,10 +17,15 @@ export const queryKeys = {
     search?: string
     categoryId?: number
     brandId?: number
+    page?: number
+    pageSize?: number
   }) => ['catalog', 'products', filters ?? {}] as const,
-  categories: ['catalog', 'categories'] as const,
-  brands: ['catalog', 'brands'] as const,
-  sales: ['sales'] as const,
+  categories: (filters?: { page?: number; pageSize?: number }) =>
+    ['catalog', 'categories', filters ?? {}] as const,
+  brands: (filters?: { page?: number; pageSize?: number }) =>
+    ['catalog', 'brands', filters ?? {}] as const,
+  sales: (filters?: { page?: number; pageSize?: number }) =>
+    ['sales', filters ?? {}] as const,
   variantByBarcode: (barcode: string) => ['catalog', 'variant', barcode] as const,
   variantById: (id: number) => ['catalog', 'variant', id] as const,
   faqSearch: (query: string) => ['faq', 'search', query] as const,

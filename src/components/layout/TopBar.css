@@ -12,6 +12,29 @@
   font-family: var(--font-family);
 }
 
+.topbar__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.topbar__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.topbar__toggle:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
 .topbar__greeting {
   font-size: var(--font-size-md);
   color: var(--color-text-muted);

@@ -1,0 +1,11 @@
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.row-actions__delete:hover {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+}

@@ -4,10 +4,14 @@ import { Navigate } from 'react-router-dom'
 import {
   createFaqArticle,
   deactivateFaqArticle,
+  deleteFaqArticle,
   getFaqArticles,
   getFaqCategories,
 } from '../../api/modules'
+import { DEFAULT_PAGE_SIZE } from '../../api/pagination'
 import { Can } from '../../components/auth/Can'
+import { PaginationBar } from '../../components/ui/PaginationBar'
+import { RowActions } from '../../components/ui/RowActions'
 import { useAuth } from '../../hooks/useAuth'
 import { P } from '../../lib/permissions'
 
@@ -22,6 +26,8 @@ export function FaqAdminPage() {
   const [keywords, setKeywords] = useState('')
   const [audienceRole, setAudienceRole] = useState('')
   const [sortOrder, setSortOrder] = useState('1')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
 
   const { data: categories = [] } = useQuery({
     queryKey: ['faq', 'categories'],
@@ -29,16 +35,19 @@ export function FaqAdminPage() {
     enabled: canManage,
   })
 
-  const { data: articles = [], isLoading, isError } = useQuery({
-    queryKey: ['faq', 'articles', 'admin'],
-    queryFn: () => getFaqArticles(true),
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['faq', 'articles', 'admin', { page, pageSize }],
+    queryFn: () => getFaqArticles({ includeInactive: true, page, pageSize }),
     enabled: canManage,
   })
+  const articles = data?.items ?? []
+
+  const invalidate = () => void queryClient.invalidateQueries({ queryKey: ['faq', 'articles'] })
 
   const createMutation = useMutation({
     mutationFn: createFaqArticle,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['faq', 'articles'] })
+      invalidate()
       setQuestion('')
       setAnswer('')
       setKeywords('')
@@ -49,7 +58,12 @@ export function FaqAdminPage() {
 
   const deactivateMutation = useMutation({
     mutationFn: deactivateFaqArticle,
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['faq', 'articles'] }),
+    onSuccess: invalidate,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteFaqArticle,
+    onSuccess: invalidate,
   })
 
   if (!canManage) {
@@ -75,7 +89,7 @@ export function FaqAdminPage() {
       <header className="page-header">
         <h1 className="page-title">FAQ</h1>
         <p className="page-subtitle">
-          Alta y desactivación con Faq.Manage. DELETE desactiva (no borra).
+          Alta, desactivación y borrado con Faq.Manage.
         </p>
       </header>
 
@@ -165,49 +179,62 @@ export function FaqAdminPage() {
       ) : articles.length === 0 ? (
         <div className="empty-state">No hay artículos FAQ</div>
       ) : (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Categoría</th>
-                <th>Pregunta</th>
-                <th>Estado</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {articles.map((article) => (
-                <tr key={article.faqArticleId}>
-                  <td>{article.categoryName}</td>
-                  <td>
-                    <strong>{article.question}</strong>
-                    <div style={{ color: 'var(--color-text-muted)', marginTop: 4 }}>
-                      {article.answer}
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`badge ${article.isActive ? 'badge-success' : 'badge-muted'}`}>
-                      {article.isActive ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td>
-                    <Can permission={P.Faq.Manage}>
-                      {article.isActive && (
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => deactivateMutation.mutate(article.faqArticleId)}
-                        >
-                          Desactivar
-                        </button>
-                      )}
-                    </Can>
-                  </td>
+        <>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th>Pregunta</th>
+                  <th>Estado</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {articles.map((article) => (
+                  <tr key={article.faqArticleId}>
+                    <td>{article.categoryName}</td>
+                    <td>
+                      <strong>{article.question}</strong>
+                      <div style={{ color: 'var(--color-text-muted)', marginTop: 4 }}>
+                        {article.answer}
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`badge ${article.isActive ? 'badge-success' : 'badge-muted'}`}>
+                        {article.isActive ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td>
+                      <Can permission={P.Faq.Manage}>
+                        <RowActions
+                          isActive={article.isActive}
+                          onDeactivate={() => deactivateMutation.mutate(article.faqArticleId)}
+                          onDelete={() => deleteMutation.mutate(article.faqArticleId)}
+                          deactivatePending={deactivateMutation.isPending}
+                          deletePending={deleteMutation.isPending}
+                        />
+                      </Can>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {data && (
+            <PaginationBar
+              page={data.page}
+              pageSize={data.pageSize}
+              totalCount={data.totalCount}
+              totalPages={data.totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size)
+                setPage(1)
+              }}
+            />
+          )}
+        </>
       )}
     </div>
   )

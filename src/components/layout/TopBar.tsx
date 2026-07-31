@@ -10,7 +10,12 @@ function getInitials(name: string): string {
     .join('')
 }
 
-export function TopBar() {
+interface TopBarProps {
+  collapsed: boolean
+  onToggleSidebar: () => void
+}
+
+export function TopBar({ collapsed, onToggleSidebar }: TopBarProps) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -23,8 +28,19 @@ export function TopBar() {
 
   return (
     <header className="topbar">
-      <div className="topbar__greeting">
-        {user ? `Bienvenido, ${user.fullName.split(' ')[0]}` : ''}
+      <div className="topbar__left">
+        <button
+          type="button"
+          className="topbar__toggle"
+          onClick={onToggleSidebar}
+          aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+          title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+        >
+          ☰
+        </button>
+        <div className="topbar__greeting">
+          {user ? `Bienvenido, ${user.fullName.split(' ')[0]}` : ''}
+        </div>
       </div>
       <div className="topbar__user">
         {user && (

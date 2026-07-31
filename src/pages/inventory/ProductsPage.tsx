@@ -5,8 +5,13 @@ import {
   createVariant,
   deactivateProduct,
   deactivateVariant,
+  deleteProduct,
+  deleteVariant,
 } from '../../api/catalogMutations'
+import { DEFAULT_PAGE_SIZE } from '../../api/pagination'
 import { Can } from '../../components/auth/Can'
+import { PaginationBar } from '../../components/ui/PaginationBar'
+import { RowActions } from '../../components/ui/RowActions'
 import { TypeaheadInput } from '../../components/ui/TypeaheadInput'
 import { useProductsQuery } from '../../hooks/useCatalogQueries'
 import { P } from '../../lib/permissions'
@@ -28,6 +33,8 @@ export function ProductsPage() {
   const [categoryLabel, setCategoryLabel] = useState('')
   const [brandLabel, setBrandLabel] = useState('')
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
 
   const [createName, setCreateName] = useState('')
   const [createCategoryId, setCreateCategoryId] = useState<number | undefined>()
@@ -46,11 +53,14 @@ export function ProductsPage() {
     reorderLevel: '5',
   })
 
-  const { data: products = [], isLoading, isError } = useProductsQuery({
+  const { data, isLoading, isError } = useProductsQuery({
     search: search || undefined,
     categoryId,
     brandId,
+    page,
+    pageSize,
   })
+  const products = data?.items ?? []
 
   const invalidate = () => void queryClient.invalidateQueries({ queryKey: ['catalog', 'products'] })
 
@@ -89,8 +99,18 @@ export function ProductsPage() {
     onSuccess: invalidate,
   })
 
+  const deleteProductMutation = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: invalidate,
+  })
+
   const deactivateVariantMutation = useMutation({
     mutationFn: deactivateVariant,
+    onSuccess: invalidate,
+  })
+
+  const deleteVariantMutation = useMutation({
+    mutationFn: deleteVariant,
     onSuccess: invalidate,
   })
 
@@ -187,7 +207,10 @@ export function ProductsPage() {
             type="search"
             className="form-input"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
           />
         </div>
         <TypeaheadInput
@@ -197,10 +220,12 @@ export function ProductsPage() {
           onSelect={(item) => {
             setCategoryId(item.id)
             setCategoryLabel(item.label)
+            setPage(1)
           }}
           onClear={() => {
             setCategoryId(undefined)
             setCategoryLabel('')
+            setPage(1)
           }}
         />
         <TypeaheadInput
@@ -210,10 +235,12 @@ export function ProductsPage() {
           onSelect={(item) => {
             setBrandId(item.id)
             setBrandLabel(item.label)
+            setPage(1)
           }}
           onClear={() => {
             setBrandId(undefined)
             setBrandLabel('')
+            setPage(1)
           }}
         />
       </div>
@@ -275,15 +302,13 @@ export function ProductsPage() {
                           {open ? 'Ocultar' : 'Precios / variantes'}
                         </button>
                         <Can permission={P.Catalog.Delete}>
-                          {product.isActive && (
-                            <button
-                              type="button"
-                              className="btn btn-ghost btn-sm"
-                              onClick={() => deactivateProductMutation.mutate(product.productId)}
-                            >
-                              Desactivar
-                            </button>
-                          )}
+                          <RowActions
+                            isActive={product.isActive}
+                            onDeactivate={() => deactivateProductMutation.mutate(product.productId)}
+                            onDelete={() => deleteProductMutation.mutate(product.productId)}
+                            deactivatePending={deactivateProductMutation.isPending}
+                            deletePending={deleteProductMutation.isPending}
+                          />
                         </Can>
                       </td>
                     </tr>
@@ -320,17 +345,17 @@ export function ProductsPage() {
                                       <td>{v.barcode ?? '—'}</td>
                                       <td>
                                         <Can permission={P.Inventory.Delete}>
-                                          {v.isActive && (
-                                            <button
-                                              type="button"
-                                              className="btn btn-ghost btn-sm"
-                                              onClick={() =>
-                                                deactivateVariantMutation.mutate(v.productVariantId)
-                                              }
-                                            >
-                                              Desactivar
-                                            </button>
-                                          )}
+                                          <RowActions
+                                            isActive={v.isActive}
+                                            onDeactivate={() =>
+                                              deactivateVariantMutation.mutate(v.productVariantId)
+                                            }
+                                            onDelete={() =>
+                                              deleteVariantMutation.mutate(v.productVariantId)
+                                            }
+                                            deactivatePending={deactivateVariantMutation.isPending}
+                                            deletePending={deleteVariantMutation.isPending}
+                                          />
                                         </Can>
                                       </td>
                                     </tr>
@@ -468,6 +493,19 @@ export function ProductsPage() {
             </tbody>
           </table>
         </div>
+      )}
+      {data && (
+        <PaginationBar
+          page={data.page}
+          pageSize={data.pageSize}
+          totalCount={data.totalCount}
+          totalPages={data.totalPages}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size)
+            setPage(1)
+          }}
+        />
       )}
     </div>
   )

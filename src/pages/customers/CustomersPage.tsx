@@ -1,6 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
-import { createCustomer, deleteCustomer, getCustomers, updateCustomer } from '../../api/customers'
+import {
+  createCustomer,
+  deactivateCustomer,
+  deleteCustomer,
+  getCustomers,
+  updateCustomer,
+} from '../../api/customers'
+import { DEFAULT_PAGE_SIZE } from '../../api/pagination'
+import { PaginationBar } from '../../components/ui/PaginationBar'
+import { RowActions } from '../../components/ui/RowActions'
 import { useAuth } from '../../hooks/useAuth'
 
 export function CustomersPage() {
@@ -9,18 +18,23 @@ export function CustomersPage() {
   const canUpdate = hasPermission('Customers.Update')
   const canDelete = hasPermission('Customers.Delete')
   const queryClient = useQueryClient()
-  const { data: customers = [], isLoading, isError } = useQuery({
-    queryKey: ['customers'],
-    queryFn: () => getCustomers(),
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['customers', { page, pageSize }],
+    queryFn: () => getCustomers({ page, pageSize }),
   })
+  const customers = data?.items ?? []
 
   const [form, setForm] = useState({ fullName: '', email: '', phone: '', documentNumber: '' })
   const [error, setError] = useState('')
 
+  const invalidate = () => void queryClient.invalidateQueries({ queryKey: ['customers'] })
+
   const createMutation = useMutation({
     mutationFn: createCustomer,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['customers'] })
+      invalidate()
       setForm({ fullName: '', email: '', phone: '', documentNumber: '' })
       setError('')
     },
@@ -28,8 +42,13 @@ export function CustomersPage() {
   })
 
   const deactivateMutation = useMutation({
+    mutationFn: deactivateCustomer,
+    onSuccess: invalidate,
+  })
+
+  const deleteMutation = useMutation({
     mutationFn: deleteCustomer,
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['customers'] }),
+    onSuccess: invalidate,
   })
 
   const handleCreate = (e: FormEvent) => {
@@ -104,68 +123,81 @@ export function CustomersPage() {
       ) : customers.length === 0 ? (
         <div className="empty-state">No hay clientes registrados</div>
       ) : (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
-                <th>Puntos</th>
-                <th>Estado</th>
-                {(canUpdate || canDelete) && <th />}
-              </tr>
-            </thead>
-            <tbody>
-              {customers.map((customer) => (
-                <tr key={customer.customerId}>
-                  <td>{customer.fullName}</td>
-                  <td>{customer.email ?? '—'}</td>
-                  <td>{customer.phone ?? '—'}</td>
-                  <td>{customer.loyaltyPoints}</td>
-                  <td>
-                    <span className={`badge ${customer.isActive ? 'badge-success' : 'badge-muted'}`}>
-                      {customer.isActive ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  {(canUpdate || canDelete) && (
-                    <td>
-                      {canDelete && customer.isActive && (
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => deactivateMutation.mutate(customer.customerId)}
-                        >
-                          Desactivar
-                        </button>
-                      )}
-                      {canUpdate && !customer.isActive && (
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          onClick={() =>
-                            void updateCustomer(customer.customerId, {
-                              fullName: customer.fullName,
-                              email: customer.email ?? undefined,
-                              phone: customer.phone ?? undefined,
-                              documentNumber: customer.documentNumber ?? undefined,
-                              notes: customer.notes ?? undefined,
-                              isActive: true,
-                            }).then(() =>
-                              queryClient.invalidateQueries({ queryKey: ['customers'] }),
-                            )
-                          }
-                        >
-                          Reactivar
-                        </button>
-                      )}
-                    </td>
-                  )}
+        <>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Correo</th>
+                  <th>Teléfono</th>
+                  <th>Puntos</th>
+                  <th>Estado</th>
+                  {(canUpdate || canDelete) && <th />}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {customers.map((customer) => (
+                  <tr key={customer.customerId}>
+                    <td>{customer.fullName}</td>
+                    <td>{customer.email ?? '—'}</td>
+                    <td>{customer.phone ?? '—'}</td>
+                    <td>{customer.loyaltyPoints}</td>
+                    <td>
+                      <span className={`badge ${customer.isActive ? 'badge-success' : 'badge-muted'}`}>
+                        {customer.isActive ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    {(canUpdate || canDelete) && (
+                      <td>
+                        <RowActions
+                          isActive={customer.isActive}
+                          canDeactivate={canDelete}
+                          canDelete={canDelete}
+                          onDeactivate={() => deactivateMutation.mutate(customer.customerId)}
+                          onDelete={() => deleteMutation.mutate(customer.customerId)}
+                          deactivatePending={deactivateMutation.isPending}
+                          deletePending={deleteMutation.isPending}
+                        />
+                        {canUpdate && !customer.isActive && (
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            onClick={() =>
+                              void updateCustomer(customer.customerId, {
+                                fullName: customer.fullName,
+                                email: customer.email ?? undefined,
+                                phone: customer.phone ?? undefined,
+                                documentNumber: customer.documentNumber ?? undefined,
+                                notes: customer.notes ?? undefined,
+                                isActive: true,
+                              }).then(invalidate)
+                            }
+                          >
+                            Reactivar
+                          </button>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {data && (
+            <PaginationBar
+              page={data.page}
+              pageSize={data.pageSize}
+              totalCount={data.totalCount}
+              totalPages={data.totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size)
+                setPage(1)
+              }}
+            />
+          )}
+        </>
       )}
     </div>
   )

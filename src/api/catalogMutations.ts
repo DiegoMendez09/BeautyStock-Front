@@ -19,6 +19,11 @@ export async function updateCategory(id: number, request: UpdateCategoryRequest)
 
 /** Baja lógica (IsActive = false). */
 export async function deactivateCategory(id: number): Promise<void> {
+  await apiClient<void>(`/api/v1/categories/${id}/deactivate`, { method: 'POST' })
+}
+
+/** Baja física (borrado permanente). */
+export async function deleteCategory(id: number): Promise<void> {
   await apiClient<void>(`/api/v1/categories/${id}`, { method: 'DELETE' })
 }
 
@@ -27,11 +32,11 @@ export async function createProduct(request: CreateProductRequest): Promise<Prod
 }
 
 export async function deactivateProduct(id: number): Promise<void> {
-  await apiClient<void>(`/api/v1/products/${id}`, { method: 'DELETE' })
+  await apiClient<void>(`/api/v1/products/${id}/deactivate`, { method: 'POST' })
 }
 
-export async function getBrands(): Promise<Brand[]> {
-  return apiClient<Brand[]>('/api/v1/brands')
+export async function deleteProduct(id: number): Promise<void> {
+  await apiClient<void>(`/api/v1/products/${id}`, { method: 'DELETE' })
 }
 
 export async function createBrand(request: {
@@ -42,6 +47,10 @@ export async function createBrand(request: {
 }
 
 export async function deactivateBrand(id: number): Promise<void> {
+  await apiClient<void>(`/api/v1/brands/${id}/deactivate`, { method: 'POST' })
+}
+
+export async function deleteBrand(id: number): Promise<void> {
   await apiClient<void>(`/api/v1/brands/${id}`, { method: 'DELETE' })
 }
 
@@ -70,5 +79,9 @@ export async function createVariant(request: CreateVariantRequest): Promise<Prod
 }
 
 export async function deactivateVariant(id: number): Promise<void> {
+  await apiClient<void>(`/api/v1/product-variants/${id}/deactivate`, { method: 'POST' })
+}
+
+export async function deleteVariant(id: number): Promise<void> {
   await apiClient<void>(`/api/v1/product-variants/${id}`, { method: 'DELETE' })
 }

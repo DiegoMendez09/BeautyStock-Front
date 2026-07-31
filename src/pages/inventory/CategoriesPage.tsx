@@ -1,20 +1,28 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
-import { createCategory, deactivateCategory } from '../../api/catalogMutations'
+import { deactivateCategory, deleteCategory, createCategory } from '../../api/catalogMutations'
+import { DEFAULT_PAGE_SIZE } from '../../api/pagination'
 import { Can } from '../../components/auth/Can'
+import { PaginationBar } from '../../components/ui/PaginationBar'
+import { RowActions } from '../../components/ui/RowActions'
 import { useCategoriesQuery } from '../../hooks/useCatalogQueries'
 import { P } from '../../lib/permissions'
 
 export function CategoriesPage() {
   const queryClient = useQueryClient()
-  const { data: categories = [], isLoading, isError } = useCategoriesQuery()
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const { data, isLoading, isError } = useCategoriesQuery({ page, pageSize })
+  const categories = data?.items ?? []
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+
+  const invalidate = () => void queryClient.invalidateQueries({ queryKey: ['catalog', 'categories'] })
 
   const createMutation = useMutation({
     mutationFn: createCategory,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['catalog', 'categories'] })
+      invalidate()
       setName('')
       setDescription('')
     },
@@ -22,7 +30,12 @@ export function CategoriesPage() {
 
   const deactivateMutation = useMutation({
     mutationFn: deactivateCategory,
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['catalog', 'categories'] }),
+    onSuccess: invalidate,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteCategory,
+    onSuccess: invalidate,
   })
 
   const handleCreate = (e: FormEvent) => {
@@ -74,46 +87,59 @@ export function CategoriesPage() {
       ) : categories.length === 0 ? (
         <div className="empty-state">No hay categorías registradas</div>
       ) : (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Estado</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((category) => (
-                <tr key={category.categoryId}>
-                  <td>{category.name}</td>
-                  <td>{category.description ?? '—'}</td>
-                  <td>
-                    <span
-                      className={`badge ${category.isActive ? 'badge-success' : 'badge-muted'}`}
-                    >
-                      {category.isActive ? 'Activa' : 'Inactiva'}
-                    </span>
-                  </td>
-                  <td>
-                    <Can permission={P.Catalog.Delete}>
-                      {category.isActive && (
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => deactivateMutation.mutate(category.categoryId)}
-                        >
-                          Desactivar
-                        </button>
-                      )}
-                    </Can>
-                  </td>
+        <>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Descripción</th>
+                  <th>Estado</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {categories.map((category) => (
+                  <tr key={category.categoryId}>
+                    <td>{category.name}</td>
+                    <td>{category.description ?? '—'}</td>
+                    <td>
+                      <span
+                        className={`badge ${category.isActive ? 'badge-success' : 'badge-muted'}`}
+                      >
+                        {category.isActive ? 'Activa' : 'Inactiva'}
+                      </span>
+                    </td>
+                    <td>
+                      <Can permission={P.Catalog.Delete}>
+                        <RowActions
+                          isActive={category.isActive}
+                          onDeactivate={() => deactivateMutation.mutate(category.categoryId)}
+                          onDelete={() => deleteMutation.mutate(category.categoryId)}
+                          deactivatePending={deactivateMutation.isPending}
+                          deletePending={deleteMutation.isPending}
+                        />
+                      </Can>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {data && (
+            <PaginationBar
+              page={data.page}
+              pageSize={data.pageSize}
+              totalCount={data.totalCount}
+              totalPages={data.totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size)
+                setPage(1)
+              }}
+            />
+          )}
+        </>
       )}
     </div>
   )

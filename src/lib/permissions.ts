@@ -32,6 +32,7 @@ export const P = {
   Sales: {
     View: 'Sales.View',
     Create: 'Sales.Create',
+    Export: 'Sales.Export',
   },
   Purchases: {
     View: 'Purchases.View',

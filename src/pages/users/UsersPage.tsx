@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
-import { createUser, deleteUser, getRoles, getUsers, updateUser } from '../../api/users'
+import { createUser, deactivateUser, deleteUser, getRoles, getUsers, updateUser } from '../../api/users'
+import { DEFAULT_PAGE_SIZE } from '../../api/pagination'
 import { Can } from '../../components/auth/Can'
+import { PaginationBar } from '../../components/ui/PaginationBar'
+import { RowActions } from '../../components/ui/RowActions'
 import { useAuth } from '../../hooks/useAuth'
 import { P } from '../../lib/permissions'
 import type { UserAccount } from '../../types'
@@ -10,10 +13,13 @@ export function UsersPage() {
   const { hasPermission } = useAuth()
   const canManage = hasPermission(P.Users.Manage)
   const queryClient = useQueryClient()
-  const { data: users = [], isLoading, isError } = useQuery({
-    queryKey: ['users'],
-    queryFn: getUsers,
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['users', { page, pageSize }],
+    queryFn: () => getUsers({ page, pageSize }),
   })
+  const users = data?.items ?? []
   const { data: roles = [] } = useQuery({
     queryKey: ['roles'],
     queryFn: getRoles,
@@ -28,10 +34,12 @@ export function UsersPage() {
   })
   const [error, setError] = useState('')
 
+  const invalidate = () => void queryClient.invalidateQueries({ queryKey: ['users'] })
+
   const createMutation = useMutation({
     mutationFn: createUser,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['users'] })
+      invalidate()
       setForm({ fullName: '', email: '', password: '', role: 'Support' })
       setError('')
     },
@@ -39,19 +47,24 @@ export function UsersPage() {
   })
 
   const toggleMutation = useMutation({
-    mutationFn: (user: UserAccount) =>
-      updateUser(user.userAccountId, {
-        fullName: user.fullName,
-        email: user.email,
-        role: user.role,
-        isActive: !user.isActive,
-      }),
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['users'] }),
+    mutationFn: async (user: UserAccount) => {
+      if (user.isActive) {
+        await deactivateUser(user.userAccountId)
+      } else {
+        await updateUser(user.userAccountId, {
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role,
+          isActive: true,
+        })
+      }
+    },
+    onSuccess: invalidate,
   })
 
   const deleteMutation = useMutation({
     mutationFn: deleteUser,
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['users'] }),
+    onSuccess: invalidate,
   })
 
   const handleCreate = (e: FormEvent) => {
@@ -128,51 +141,66 @@ export function UsersPage() {
           <div className="spinner" />
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.userAccountId}>
-                  <td>{user.fullName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.role}</td>
-                  <td>
-                    <span className={`badge ${user.isActive ? 'badge-success' : 'badge-muted'}`}>
-                      {user.isActive ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td>
-                    <Can permission={P.Users.Manage}>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => toggleMutation.mutate(user)}
-                      >
-                        {user.isActive ? 'Desactivar' : 'Activar'}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => deleteMutation.mutate(user.userAccountId)}
-                      >
-                        Baja
-                      </button>
-                    </Can>
-                  </td>
+        <>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Correo</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.userAccountId}>
+                    <td>{user.fullName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.role}</td>
+                    <td>
+                      <span className={`badge ${user.isActive ? 'badge-success' : 'badge-muted'}`}>
+                        {user.isActive ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td>
+                      <Can permission={P.Users.Manage}>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => toggleMutation.mutate(user)}
+                          disabled={toggleMutation.isPending}
+                        >
+                          {user.isActive ? 'Desactivar' : 'Activar'}
+                        </button>
+                        <RowActions
+                          canDeactivate={false}
+                          onDelete={() => deleteMutation.mutate(user.userAccountId)}
+                          deletePending={deleteMutation.isPending}
+                          confirmDeleteMessage="Esta acción eliminará al usuario de forma permanente y no se puede deshacer. ¿Deseas continuar?"
+                        />
+                      </Can>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {data && (
+            <PaginationBar
+              page={data.page}
+              pageSize={data.pageSize}
+              totalCount={data.totalCount}
+              totalPages={data.totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size)
+                setPage(1)
+              }}
+            />
+          )}
+        </>
       )}
     </div>
   )

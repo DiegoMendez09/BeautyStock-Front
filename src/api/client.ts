@@ -61,3 +61,43 @@ export async function apiClient<T>(
 
   return response.json() as Promise<T>
 }
+
+/** Descarga un archivo binario (p. ej. PDF) y dispara la descarga en el navegador. */
+export async function downloadBlob(path: string, filename: string): Promise<void> {
+  let response: Response
+  try {
+    response = await fetch(`${baseUrl}${path}`, {
+      credentials: 'include',
+      headers: { Accept: 'application/pdf' },
+    })
+  } catch {
+    throw new ApiClientError(
+      'No se pudo conectar con el servidor. Verifica que la API esté en ejecución.',
+      0,
+    )
+  }
+
+  if (!response.ok) {
+    let message = response.statusText
+    try {
+      const errorBody = (await response.json()) as { message?: string; title?: string }
+      message = errorBody.message ?? errorBody.title ?? message
+    } catch {
+      // ignore
+    }
+    throw new ApiClientError(message, response.status)
+  }
+
+  const blob = await response.blob()
+  const url = URL.createObjectURL(blob)
+  try {
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  } finally {
+    URL.revokeObjectURL(url)
+  }
+}
