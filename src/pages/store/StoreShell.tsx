@@ -1,4 +1,5 @@
-import { Link, Outlet } from 'react-router-dom'
+import { useState, type FormEvent } from 'react'
+import { Link, Outlet, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useCartStore } from '../../stores/cartStore'
 import './StoreShell.css'
@@ -6,52 +7,69 @@ import './StoreShell.css'
 export function StoreShell() {
   const { isAuthenticated, user, logout } = useAuth()
   const totalItems = useCartStore((s) => s.totalItems())
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const [search, setSearch] = useState(searchParams.get('q') ?? '')
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault()
+    const q = search.trim()
+    const params = new URLSearchParams()
+    if (q) params.set('q', q)
+    navigate(`/tienda${params.toString() ? `?${params}` : ''}`)
+  }
 
   return (
     <div className="store-shell">
-      <header className="store-header">
-        <div className="store-header__inner">
-          <Link to="/tienda" className="store-header__brand">
-            <span className="store-header__logo">BeautyStock</span>
-            <span className="store-header__tag">Tienda</span>
+      <header className="ml-header">
+        <div className="ml-header__inner">
+          <Link to="/tienda" className="ml-header__brand" onClick={() => setSearch('')}>
+            <span className="ml-header__logo">BeautyStock</span>
           </Link>
 
-          <nav className="store-header__nav">
-            <Link to="/tienda" className="store-header__link">
-              Catálogo
-            </Link>
-            <Link to="/tienda/carrito" className="store-header__cart">
+          <form className="ml-search" onSubmit={handleSearch} role="search">
+            <input
+              className="ml-search__input"
+              placeholder="Buscar productos, marcas y más…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Buscar en la tienda"
+            />
+            <button type="submit" className="ml-search__btn" aria-label="Buscar">
+              Buscar
+            </button>
+          </form>
+
+          <nav className="ml-header__nav">
+            <Link to="/tienda/carrito" className="ml-header__cart">
               Carrito
-              {totalItems > 0 && <span className="store-header__badge">{totalItems}</span>}
+              {totalItems > 0 && <span className="ml-header__badge">{totalItems}</span>}
             </Link>
             {isAuthenticated ? (
               <>
-                <Link to="/" className="store-header__link">
+                <Link to="/panel" className="ml-header__link">
                   Panel
                 </Link>
-                <button
-                  type="button"
-                  className="store-header__login"
-                  onClick={() => void logout()}
-                >
+                <button type="button" className="ml-header__user" onClick={() => void logout()}>
                   {user?.fullName.split(' ')[0] ?? 'Salir'}
                 </button>
               </>
             ) : (
-              <Link to="/login" className="store-header__login">
-                Iniciar sesión
+              <Link to="/login" className="ml-header__user">
+                Ingresá
               </Link>
             )}
           </nav>
         </div>
       </header>
+
       <main className="store-main">
         <Outlet />
       </main>
+
       <footer className="store-footer">
         <div className="store-footer__inner">
-          <span>BeautyStock · Belleza y cuidado</span>
-          <Link to="/login">Acceso staff</Link>
+          <span>BeautyStock · Productos de belleza</span>
         </div>
       </footer>
     </div>

@@ -44,6 +44,9 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
 export function AppRouter() {
   return (
     <Routes>
+      {/* Entrada por defecto = tienda */}
+      <Route path="/" element={<Navigate to="/tienda" replace />} />
+
       <Route path="/login" element={<LoginPage />} />
 
       <Route path="/tienda" element={<StoreShell />}>
@@ -53,6 +56,7 @@ export function AppRouter() {
       </Route>
 
       <Route
+        path="/panel"
         element={
           <ProtectedRoute>
             <AppShell />
@@ -60,6 +64,29 @@ export function AppRouter() {
         }
       >
         <Route index element={<DashboardPage />} />
+        <Route path="inventario/productos" element={<ProductsPage />} />
+        <Route path="inventario/categorias" element={<CategoriesPage />} />
+        <Route path="inventario/marcas" element={<BrandsPage />} />
+        <Route path="ventas/pos" element={<PosPage />} />
+        <Route path="ventas/historial" element={<SalesHistoryPage />} />
+        <Route path="clientes" element={<CustomersPage />} />
+        <Route path="compras" element={<PurchasesPage />} />
+        <Route path="reportes" element={<ReportsPage />} />
+        <Route path="notificaciones" element={<NotificationsPage />} />
+        <Route path="faq" element={<FaqAdminPage />} />
+        <Route path="auditoria" element={<AuditPage />} />
+        <Route path="usuarios" element={<UsersPage />} />
+        <Route path="configuracion" element={<SettingsPage />} />
+      </Route>
+
+      {/* Compatibilidad con menú del API (rutas sin /panel) */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <AppShell />
+          </ProtectedRoute>
+        }
+      >
         <Route path="inventario/productos" element={<ProductsPage />} />
         <Route path="inventario/categorias" element={<CategoriesPage />} />
         <Route path="inventario/marcas" element={<BrandsPage />} />

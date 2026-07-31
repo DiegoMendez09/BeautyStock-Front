@@ -88,7 +88,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <NavLink
             key={`${item.moduleId}-${item.routePath}`}
             to={item.routePath}
-            end={item.routePath === '/'}
+            end={item.routePath === '/' || item.routePath === '/panel'}
             title={collapsed ? item.name : undefined}
             className={({ isActive }) =>
               `sidebar__link${isActive ? ' sidebar__link--active' : ''}`

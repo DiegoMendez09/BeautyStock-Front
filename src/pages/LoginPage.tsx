@@ -23,7 +23,7 @@ export function LoginPage() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to={from && from.startsWith('/') ? from : '/'} replace />
+    return <Navigate to={from && from.startsWith('/') ? from : '/panel'} replace />
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -33,7 +33,7 @@ export function LoginPage() {
 
     try {
       await login(email, password)
-      navigate(from && from.startsWith('/') ? from : '/')
+      navigate(from && from.startsWith('/') ? from : '/panel')
     } catch (err) {
       if (err instanceof ApiClientError) {
         setError(
