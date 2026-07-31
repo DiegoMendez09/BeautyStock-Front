@@ -138,6 +138,23 @@
   gap: var(--space-lg);
 }
 
+.login-page__store-link {
+  display: inline-block;
+  margin-top: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  padding-bottom: 2px;
+}
+
+.login-page__store-link:hover {
+  color: #fff;
+  text-decoration: none;
+  border-bottom-color: #fff;
+}
+
 @media (max-width: 768px) {
   .login-page__content {
     grid-template-columns: 1fr;

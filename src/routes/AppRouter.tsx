@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AppShell } from '../components/layout/AppShell'
 import { useAuth } from '../hooks/useAuth'
 import { AuditPage } from '../pages/audit/AuditPage'
@@ -15,11 +15,16 @@ import { ReportsPage } from '../pages/reports/ReportsPage'
 import { PosPage } from '../pages/sales/PosPage'
 import { SalesHistoryPage } from '../pages/sales/SalesHistoryPage'
 import { SettingsPage } from '../pages/settings/SettingsPage'
+import { CartPage } from '../pages/store/CartPage'
+import { MarketplacePage } from '../pages/store/MarketplacePage'
+import { ProductDetailPage } from '../pages/store/ProductDetailPage'
+import { StoreShell } from '../pages/store/StoreShell'
 import { UsersPage } from '../pages/users/UsersPage'
 import type { ReactNode } from 'react'
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth()
+  const location = useLocation()
 
   if (isLoading) {
     return (
@@ -30,7 +35,7 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />
   }
 
   return children
@@ -40,6 +45,13 @@ export function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+
+      <Route path="/tienda" element={<StoreShell />}>
+        <Route index element={<MarketplacePage />} />
+        <Route path="producto/:id" element={<ProductDetailPage />} />
+        <Route path="carrito" element={<CartPage />} />
+      </Route>
+
       <Route
         element={
           <ProtectedRoute>
@@ -62,7 +74,8 @@ export function AppRouter() {
         <Route path="usuarios" element={<UsersPage />} />
         <Route path="configuracion" element={<SettingsPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route path="*" element={<Navigate to="/tienda" replace />} />
     </Routes>
   )
 }

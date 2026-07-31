@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+﻿import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import './TopBar.css'
 
@@ -22,7 +22,7 @@ export function TopBar({ collapsed, onToggleSidebar }: TopBarProps) {
   const handleLogout = () => {
     void (async () => {
       await logout()
-      navigate('/login')
+      navigate('/tienda')
     })()
   }
 
@@ -52,8 +52,11 @@ export function TopBar({ collapsed, onToggleSidebar }: TopBarProps) {
             </div>
           </>
         )}
+        <Link to="/tienda" className="topbar__logout">
+          Tienda
+        </Link>
         <button type="button" className="topbar__logout" onClick={handleLogout}>
-          Cerrar sesión
+          Salir
         </button>
       </div>
     </header>

@@ -79,11 +79,17 @@ export async function downloadBlob(path: string, filename: string): Promise<void
 
   if (!response.ok) {
     let message = response.statusText
-    try {
-      const errorBody = (await response.json()) as { message?: string; title?: string }
-      message = errorBody.message ?? errorBody.title ?? message
-    } catch {
-      // ignore
+    if (response.status === 403) {
+      message = 'No tienes permiso para exportar este PDF.'
+    } else if (response.status === 401) {
+      message = 'Sesión expirada. Vuelve a iniciar sesión.'
+    } else {
+      try {
+        const errorBody = (await response.json()) as { message?: string; title?: string }
+        message = errorBody.message ?? errorBody.title ?? message
+      } catch {
+        // ignore
+      }
     }
     throw new ApiClientError(message, response.status)
   }

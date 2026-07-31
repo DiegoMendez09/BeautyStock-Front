@@ -19,6 +19,7 @@ export function SalesHistoryPage() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
+  const [exportError, setExportError] = useState('')
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['sales', 'list', { page, pageSize }],
@@ -37,6 +38,14 @@ export function SalesHistoryPage() {
         from: fromDate || undefined,
         to: toDate || undefined,
       }),
+    onError: (err) => {
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : 'No se pudo exportar el historial en PDF'
+      setExportError(message)
+    },
+    onMutate: () => setExportError(''),
   })
 
   return (
@@ -47,16 +56,17 @@ export function SalesHistoryPage() {
       </header>
 
       {isError && <div className="alert alert-error">No se pudieron cargar las ventas</div>}
-      {exportMutation.isError && (
-        <div className="alert alert-error">No se pudo exportar el historial en PDF</div>
-      )}
+      {exportError && <div className="alert alert-error">{exportError}</div>}
 
-      <Can anyOf={[P.Sales.Export, P.Sales.View]}>
+      <Can permission={P.Sales.View}>
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <h2 className="card-title">Exportar historial</h2>
+          <p className="page-subtitle" style={{ marginBottom: '0.75rem' }}>
+            Las fechas son opcionales: sin fechas exporta todo; puedes usar solo desde, solo hasta, o ambas.
+          </p>
           <div className="page-filters">
             <div className="form-group">
-              <label className="form-label">Desde</label>
+              <label className="form-label">Desde (opcional)</label>
               <input
                 type="date"
                 className="form-input"
@@ -65,7 +75,7 @@ export function SalesHistoryPage() {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Hasta</label>
+              <label className="form-label">Hasta (opcional)</label>
               <input
                 type="date"
                 className="form-input"
@@ -116,7 +126,7 @@ export function SalesHistoryPage() {
                     <td>{formatPrice(sale.totalAmount)}</td>
                     <td>{sale.status}</td>
                     <td>
-                      <Can anyOf={[P.Sales.Export, P.Sales.View]}>
+                      <Can permission={P.Sales.View}>
                         <button
                           type="button"
                           className="btn btn-ghost btn-sm"

@@ -1,6 +1,7 @@
 .app-shell {
   display: flex;
   min-height: 100vh;
+  position: relative;
 }
 
 .app-shell__main {
@@ -8,6 +9,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  width: 100%;
   margin-left: var(--sidebar-width);
   transition: margin-left var(--transition-base);
 }
@@ -19,11 +21,28 @@
 .app-shell__content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   background: var(--color-bg);
+  min-width: 0;
 }
 
-@media (max-width: 768px) {
-  .app-shell__main {
+.app-shell__backdrop {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .app-shell__main,
+  .app-shell--collapsed .app-shell__main {
     margin-left: 0;
+  }
+
+  .app-shell__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 24, 40, 0.45);
+    z-index: 90;
+    border: none;
+    cursor: pointer;
   }
 }

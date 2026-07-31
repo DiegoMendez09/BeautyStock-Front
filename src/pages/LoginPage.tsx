@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiClientError } from '../api/client'
 import { useAuth } from '../hooks/useAuth'
 import './LoginPage.css'
@@ -7,6 +7,8 @@ import './LoginPage.css'
 export function LoginPage() {
   const { login, isAuthenticated, isLoading } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = (location.state as { from?: string } | null)?.from
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -21,7 +23,7 @@ export function LoginPage() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />
+    return <Navigate to={from && from.startsWith('/') ? from : '/'} replace />
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -31,7 +33,7 @@ export function LoginPage() {
 
     try {
       await login(email, password)
-      navigate('/')
+      navigate(from && from.startsWith('/') ? from : '/')
     } catch (err) {
       if (err instanceof ApiClientError) {
         setError(
@@ -63,6 +65,7 @@ export function LoginPage() {
             <li>Punto de venta integrado</li>
             <li>Reportes y auditoría</li>
           </ul>
+          <Link to="/tienda" className="login-page__store-link">Ver tienda pública</Link>
         </div>
 
         <div className="login-page__form-panel">
@@ -115,3 +118,4 @@ export function LoginPage() {
     </div>
   )
 }
+

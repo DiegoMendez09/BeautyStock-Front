@@ -241,6 +241,9 @@ textarea {
 .page {
   padding: var(--space-xl);
   max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  min-width: 0;
 }
 
 .page-header {
@@ -250,14 +253,49 @@ textarea {
 }
 
 .page-title {
-  font-size: var(--font-size-2xl);
+  font-size: clamp(1.35rem, 2.5vw, var(--font-size-2xl));
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--space-xs);
+  word-break: break-word;
 }
 
 .page-subtitle {
   color: var(--color-text-muted);
   font-size: var(--font-size-base);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: var(--space-md);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-lg);
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .kpi-value {
+    font-size: var(--font-size-2xl);
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.55rem 0.65rem;
+  }
+
+  .card {
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .kpi-grid {

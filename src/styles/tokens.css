@@ -77,8 +77,8 @@
   --space-2xl: 3rem;
 
   /* ——— Layout ——— */
-  --sidebar-width: 248px;
-  --sidebar-collapsed-width: 4rem;
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 4.25rem;
   --topbar-height: 56px;
   --radius-sm: 4px;
   --radius-md: 6px;

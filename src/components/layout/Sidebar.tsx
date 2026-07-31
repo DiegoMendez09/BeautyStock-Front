@@ -45,7 +45,7 @@ function expandMenu(menu: ModuleMenuItem[]): ModuleMenuItem[] {
         {
           ...item,
           moduleId: item.moduleId * 100 + 2,
-          name: 'Histor ventas',
+          name: 'Historial',
           routePath: '/ventas/historial',
           iconKey: 'sales',
         },
