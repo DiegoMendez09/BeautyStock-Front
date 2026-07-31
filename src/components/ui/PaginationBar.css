@@ -7,6 +7,16 @@
   padding: var(--space-md) 0.25rem;
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-md);
+}
+
+.pagination-bar[data-fetching='true'] {
+  opacity: 0.92;
+}
+
+.pagination-bar__info {
+  color: var(--color-text-muted);
 }
 
 .pagination-bar__controls {
@@ -21,15 +31,25 @@
   align-items: center;
   gap: var(--space-sm);
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  color: var(--color-text);
 }
 
 .pagination-bar__size .form-input {
-  padding: 0.3rem 0.5rem;
+  padding: 0.35rem 0.5rem;
   width: auto;
+  min-height: 2.25rem;
 }
 
 .pagination-bar__nav {
   display: flex;
+  align-items: center;
   gap: var(--space-sm);
+}
+
+.pagination-bar__page {
+  min-width: 3.5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
 }

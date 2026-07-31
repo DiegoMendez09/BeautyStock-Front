@@ -12,7 +12,7 @@ export function CategoriesPage() {
   const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
-  const { data, isLoading, isError } = useCategoriesQuery({ page, pageSize })
+  const { data, isLoading, isError, isFetching } = useCategoriesQuery({ page, pageSize })
   const categories = data?.items ?? []
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -132,6 +132,7 @@ export function CategoriesPage() {
               pageSize={data.pageSize}
               totalCount={data.totalCount}
               totalPages={data.totalPages}
+              isFetching={isFetching}
               onPageChange={setPage}
               onPageSizeChange={(size) => {
                 setPageSize(size)

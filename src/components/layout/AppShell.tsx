@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import { SkipLink } from '../a11y/SkipLink'
 import { FaqWidget } from '../faq/FaqWidget'
 import { useInventoryHub } from '../../hooks/useInventoryHub'
 import { useSidebarCollapsed } from '../../hooks/useSidebarCollapsed'
@@ -14,18 +15,19 @@ export function AppShell() {
 
   return (
     <div className={`app-shell${collapsed ? ' app-shell--collapsed' : ''}`}>
+      <SkipLink />
       {!collapsed && (
         <button
           type="button"
           className="app-shell__backdrop"
-          aria-label="Cerrar menú"
+          aria-label="Cerrar menú de navegación"
           onClick={closeSidebar}
         />
       )}
       <Sidebar collapsed={collapsed} onToggle={toggleSidebar} />
       <div className="app-shell__main">
         <TopBar collapsed={collapsed} onToggleSidebar={toggleSidebar} />
-        <main className="app-shell__content">
+        <main id="main-content" className="app-shell__content" tabIndex={-1}>
           <Outlet />
         </main>
       </div>

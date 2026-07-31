@@ -1,6 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import {
+  DEFAULT_PAGE_SIZE,
+  PAGE_SIZE_OPTIONS,
+} from '../../api/pagination'
 import {
   getStoreFacets,
   getStoreProducts,
@@ -10,6 +14,11 @@ import {
 import { PaginationBar } from '../../components/ui/PaginationBar'
 import { useCartStore } from '../../stores/cartStore'
 import './MarketplacePage.css'
+
+function resolvePageSize(raw: string | null): number {
+  const n = Number(raw ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE
+  return (PAGE_SIZE_OPTIONS as readonly number[]).includes(n) ? n : DEFAULT_PAGE_SIZE
+}
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -33,7 +42,7 @@ export function MarketplacePage() {
   const brandId = searchParams.get('brandId') ? Number(searchParams.get('brandId')) : undefined
   const sort = (searchParams.get('sort') as StoreSort | null) ?? 'relevance'
   const page = Number(searchParams.get('page') ?? '1') || 1
-  const pageSize = Number(searchParams.get('pageSize') ?? '24') || 24
+  const pageSize = resolvePageSize(searchParams.get('pageSize'))
 
   const [minPriceInput, setMinPriceInput] = useState(searchParams.get('minPrice') ?? '')
   const [maxPriceInput, setMaxPriceInput] = useState(searchParams.get('maxPrice') ?? '')
@@ -76,6 +85,7 @@ export function MarketplacePage() {
         page,
         pageSize,
       }),
+    placeholderData: keepPreviousData,
   })
 
   const products = data?.items ?? []
@@ -357,10 +367,11 @@ export function MarketplacePage() {
               </div>
 
               <PaginationBar
-                page={page}
-                pageSize={pageSize}
+                page={data?.page ?? page}
+                pageSize={data?.pageSize ?? pageSize}
                 totalCount={totalCount}
                 totalPages={totalPages}
+                isFetching={isFetching}
                 onPageChange={(next) => patchParams({ page: String(next) })}
                 onPageSizeChange={(size) =>
                   patchParams({ pageSize: String(size), page: '1' })

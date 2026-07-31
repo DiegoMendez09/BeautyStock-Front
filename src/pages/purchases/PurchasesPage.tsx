@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import {
   createPurchaseOrder,
@@ -28,17 +28,19 @@ export function PurchasesPage() {
   const queryClient = useQueryClient()
   const [supplierPage, setSupplierPage] = useState(1)
   const [supplierPageSize, setSupplierPageSize] = useState(DEFAULT_PAGE_SIZE)
-  const { data: supplierData } = useQuery({
+  const { data: supplierData, isFetching: suppliersFetching } = useQuery({
     queryKey: ['purchases', 'suppliers', { page: supplierPage, pageSize: supplierPageSize }],
     queryFn: () => getSuppliers({ page: supplierPage, pageSize: supplierPageSize }),
+    placeholderData: keepPreviousData,
   })
   const suppliers = supplierData?.items ?? []
 
   const [orderPage, setOrderPage] = useState(1)
   const [orderPageSize, setOrderPageSize] = useState(DEFAULT_PAGE_SIZE)
-  const { data: orderData, isLoading } = useQuery({
+  const { data: orderData, isLoading, isFetching: ordersFetching } = useQuery({
     queryKey: ['purchases', 'orders', { page: orderPage, pageSize: orderPageSize }],
     queryFn: () => getPurchaseOrders({ page: orderPage, pageSize: orderPageSize }),
+    placeholderData: keepPreviousData,
   })
   const orders = orderData?.items ?? []
 
@@ -246,6 +248,7 @@ export function PurchasesPage() {
           pageSize={supplierData.pageSize}
           totalCount={supplierData.totalCount}
           totalPages={supplierData.totalPages}
+          isFetching={suppliersFetching}
           onPageChange={setSupplierPage}
           onPageSizeChange={(size) => {
             setSupplierPageSize(size)
@@ -307,6 +310,7 @@ export function PurchasesPage() {
               pageSize={orderData.pageSize}
               totalCount={orderData.totalCount}
               totalPages={orderData.totalPages}
+              isFetching={ordersFetching}
               onPageChange={setOrderPage}
               onPageSizeChange={(size) => {
                 setOrderPageSize(size)

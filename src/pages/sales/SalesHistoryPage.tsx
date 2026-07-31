@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { downloadSalePdf, downloadSalesExportPdf, getSales } from '../../api/sales'
 import { DEFAULT_PAGE_SIZE } from '../../api/pagination'
@@ -21,9 +21,10 @@ export function SalesHistoryPage() {
   const [toDate, setToDate] = useState('')
   const [exportError, setExportError] = useState('')
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['sales', 'list', { page, pageSize }],
     queryFn: () => getSales({ page, pageSize }),
+    placeholderData: keepPreviousData,
   })
   const sales = data?.items ?? []
 
@@ -153,6 +154,7 @@ export function SalesHistoryPage() {
               pageSize={data.pageSize}
               totalCount={data.totalCount}
               totalPages={data.totalPages}
+              isFetching={isFetching}
               onPageChange={setPage}
               onPageSizeChange={(size) => {
                 setPageSize(size)

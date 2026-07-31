@@ -53,7 +53,7 @@ export function ProductsPage() {
     reorderLevel: '5',
   })
 
-  const { data, isLoading, isError } = useProductsQuery({
+  const { data, isLoading, isError, isFetching } = useProductsQuery({
     search: search || undefined,
     categoryId,
     brandId,
@@ -500,6 +500,7 @@ export function ProductsPage() {
           pageSize={data.pageSize}
           totalCount={data.totalCount}
           totalPages={data.totalPages}
+          isFetching={isFetching}
           onPageChange={setPage}
           onPageSizeChange={(size) => {
             setPageSize(size)

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { getBrands } from '../../api/catalog'
 import { createBrand, deactivateBrand, deleteBrand } from '../../api/catalogMutations'
@@ -12,9 +12,10 @@ export function BrandsPage() {
   const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['catalog', 'brands', { page, pageSize }],
     queryFn: () => getBrands({ page, pageSize }),
+    placeholderData: keepPreviousData,
   })
   const brands = data?.items ?? []
   const [name, setName] = useState('')
@@ -131,6 +132,7 @@ export function BrandsPage() {
               pageSize={data.pageSize}
               totalCount={data.totalCount}
               totalPages={data.totalPages}
+              isFetching={isFetching}
               onPageChange={setPage}
               onPageSizeChange={(size) => {
                 setPageSize(size)

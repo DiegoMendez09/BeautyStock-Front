@@ -1,6 +1,6 @@
 import { apiClient } from './client'
 import { buildQueryString, sanitizeSearchInput } from '../lib/queryParams'
-import type { PageParams } from './pagination'
+import { DEFAULT_PAGE_SIZE, type PageParams } from './pagination'
 import type { PagedResult } from '../types'
 
 export interface StoreVariant {
@@ -60,7 +60,7 @@ export async function getStoreProducts(
     maxPrice: params.maxPrice,
     sort: params.sort,
     page: params.page,
-    pageSize: params.pageSize ?? 24,
+    pageSize: params.pageSize ?? DEFAULT_PAGE_SIZE,
   })
   return apiClient<PagedResult<StoreProduct>>(`/api/v1/store/products${qs}`)
 }

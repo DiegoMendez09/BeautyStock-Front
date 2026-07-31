@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import {
   createCustomer,
@@ -20,9 +20,10 @@ export function CustomersPage() {
   const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['customers', { page, pageSize }],
     queryFn: () => getCustomers({ page, pageSize }),
+    placeholderData: keepPreviousData,
   })
   const customers = data?.items ?? []
 
@@ -190,6 +191,7 @@ export function CustomersPage() {
               pageSize={data.pageSize}
               totalCount={data.totalCount}
               totalPages={data.totalPages}
+              isFetching={isFetching}
               onPageChange={setPage}
               onPageSizeChange={(size) => {
                 setPageSize(size)

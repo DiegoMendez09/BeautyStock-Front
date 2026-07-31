@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import {
@@ -35,10 +35,11 @@ export function FaqAdminPage() {
     enabled: canManage,
   })
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['faq', 'articles', 'admin', { page, pageSize }],
     queryFn: () => getFaqArticles({ includeInactive: true, page, pageSize }),
     enabled: canManage,
+    placeholderData: keepPreviousData,
   })
   const articles = data?.items ?? []
 
@@ -227,6 +228,7 @@ export function FaqAdminPage() {
               pageSize={data.pageSize}
               totalCount={data.totalCount}
               totalPages={data.totalPages}
+              isFetching={isFetching}
               onPageChange={setPage}
               onPageSizeChange={(size) => {
                 setPageSize(size)

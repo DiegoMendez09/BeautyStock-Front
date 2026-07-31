@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { createUser, deactivateUser, deleteUser, getRoles, getUsers, updateUser } from '../../api/users'
 import { DEFAULT_PAGE_SIZE } from '../../api/pagination'
@@ -15,9 +15,10 @@ export function UsersPage() {
   const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['users', { page, pageSize }],
     queryFn: () => getUsers({ page, pageSize }),
+    placeholderData: keepPreviousData,
   })
   const users = data?.items ?? []
   const { data: roles = [] } = useQuery({
@@ -193,6 +194,7 @@ export function UsersPage() {
               pageSize={data.pageSize}
               totalCount={data.totalCount}
               totalPages={data.totalPages}
+              isFetching={isFetching}
               onPageChange={setPage}
               onPageSizeChange={(size) => {
                 setPageSize(size)
