@@ -1,47 +1,49 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
-import { createCategory, deactivateCategory } from '../../api/catalogMutations'
+import { createBrand, deactivateBrand, getBrands } from '../../api/catalogMutations'
 import { Can } from '../../components/auth/Can'
-import { useCategoriesQuery } from '../../hooks/useCatalogQueries'
 import { P } from '../../lib/permissions'
 
-export function CategoriesPage() {
+export function BrandsPage() {
   const queryClient = useQueryClient()
-  const { data: categories = [], isLoading, isError } = useCategoriesQuery()
+  const { data: brands = [], isLoading, isError } = useQuery({
+    queryKey: ['catalog', 'brands'],
+    queryFn: getBrands,
+  })
   const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
+  const [country, setCountry] = useState('')
 
   const createMutation = useMutation({
-    mutationFn: createCategory,
+    mutationFn: createBrand,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['catalog', 'categories'] })
+      void queryClient.invalidateQueries({ queryKey: ['catalog', 'brands'] })
       setName('')
-      setDescription('')
+      setCountry('')
     },
   })
 
   const deactivateMutation = useMutation({
-    mutationFn: deactivateCategory,
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['catalog', 'categories'] }),
+    mutationFn: deactivateBrand,
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['catalog', 'brands'] }),
   })
 
   const handleCreate = (e: FormEvent) => {
     e.preventDefault()
-    createMutation.mutate({ name, description: description || undefined })
+    createMutation.mutate({ name, countryOfOrigin: country || undefined })
   }
 
   return (
     <div className="page">
       <header className="page-header">
-        <h1 className="page-title">Categorías</h1>
-        <p className="page-subtitle">Organización del catálogo por categorías</p>
+        <h1 className="page-title">Marcas</h1>
+        <p className="page-subtitle">Catálogo de marcas (Catalog.Create / Delete → desactivar)</p>
       </header>
 
-      {isError && <div className="alert alert-error">No se pudieron cargar las categorías</div>}
+      {isError && <div className="alert alert-error">No se pudieron cargar las marcas</div>}
 
       <Can permission={P.Catalog.Create}>
         <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
-          <h2 className="card-title">Nueva categoría</h2>
+          <h2 className="card-title">Nueva marca</h2>
           <div className="page-filters">
             <div className="form-group">
               <label className="form-label">Nombre</label>
@@ -53,56 +55,52 @@ export function CategoriesPage() {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Descripción</label>
+              <label className="form-label">País de origen</label>
               <input
                 className="form-input"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
               />
             </div>
           </div>
           <button type="submit" className="btn btn-primary" disabled={createMutation.isPending}>
-            Crear
+            Crear marca
           </button>
         </form>
       </Can>
 
       {isLoading ? (
-        <div className="loading-screen" style={{ minHeight: '200px' }}>
+        <div className="loading-screen" style={{ minHeight: 160 }}>
           <div className="spinner" />
         </div>
-      ) : categories.length === 0 ? (
-        <div className="empty-state">No hay categorías registradas</div>
       ) : (
         <div className="table-wrapper">
           <table className="data-table">
             <thead>
               <tr>
                 <th>Nombre</th>
-                <th>Descripción</th>
+                <th>País</th>
                 <th>Estado</th>
                 <th />
               </tr>
             </thead>
             <tbody>
-              {categories.map((category) => (
-                <tr key={category.categoryId}>
-                  <td>{category.name}</td>
-                  <td>{category.description ?? '—'}</td>
+              {brands.map((brand) => (
+                <tr key={brand.brandId}>
+                  <td>{brand.name}</td>
+                  <td>{brand.countryOfOrigin ?? '—'}</td>
                   <td>
-                    <span
-                      className={`badge ${category.isActive ? 'badge-success' : 'badge-muted'}`}
-                    >
-                      {category.isActive ? 'Activa' : 'Inactiva'}
+                    <span className={`badge ${brand.isActive ? 'badge-success' : 'badge-muted'}`}>
+                      {brand.isActive ? 'Activa' : 'Inactiva'}
                     </span>
                   </td>
                   <td>
                     <Can permission={P.Catalog.Delete}>
-                      {category.isActive && (
+                      {brand.isActive && (
                         <button
                           type="button"
                           className="btn btn-ghost btn-sm"
-                          onClick={() => deactivateMutation.mutate(category.categoryId)}
+                          onClick={() => deactivateMutation.mutate(brand.brandId)}
                         >
                           Desactivar
                         </button>

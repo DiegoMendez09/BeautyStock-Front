@@ -33,6 +33,18 @@ export const P = {
     View: 'Sales.View',
     Create: 'Sales.Create',
   },
+  Purchases: {
+    View: 'Purchases.View',
+    Create: 'Purchases.Create',
+    Update: 'Purchases.Update',
+    Delete: 'Purchases.Delete',
+  },
+  Reports: {
+    View: 'Reports.View',
+  },
+  Settings: {
+    Manage: 'Settings.Manage',
+  },
   Notifications: {
     View: 'Notifications.View',
   },

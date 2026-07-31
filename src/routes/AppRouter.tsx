@@ -5,12 +5,16 @@ import { AuditPage } from '../pages/audit/AuditPage'
 import { CustomersPage } from '../pages/customers/CustomersPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { FaqAdminPage } from '../pages/faq/FaqAdminPage'
+import { BrandsPage } from '../pages/inventory/BrandsPage'
 import { CategoriesPage } from '../pages/inventory/CategoriesPage'
 import { ProductsPage } from '../pages/inventory/ProductsPage'
 import { LoginPage } from '../pages/LoginPage'
 import { NotificationsPage } from '../pages/notifications/NotificationsPage'
+import { PurchasesPage } from '../pages/purchases/PurchasesPage'
 import { ReportsPage } from '../pages/reports/ReportsPage'
 import { PosPage } from '../pages/sales/PosPage'
+import { SalesHistoryPage } from '../pages/sales/SalesHistoryPage'
+import { SettingsPage } from '../pages/settings/SettingsPage'
 import { UsersPage } from '../pages/users/UsersPage'
 import type { ReactNode } from 'react'
 
@@ -46,15 +50,17 @@ export function AppRouter() {
         <Route index element={<DashboardPage />} />
         <Route path="inventario/productos" element={<ProductsPage />} />
         <Route path="inventario/categorias" element={<CategoriesPage />} />
+        <Route path="inventario/marcas" element={<BrandsPage />} />
         <Route path="ventas/pos" element={<PosPage />} />
+        <Route path="ventas/historial" element={<SalesHistoryPage />} />
         <Route path="clientes" element={<CustomersPage />} />
-        <Route path="compras" element={<ReportsPage />} />
+        <Route path="compras" element={<PurchasesPage />} />
         <Route path="reportes" element={<ReportsPage />} />
         <Route path="notificaciones" element={<NotificationsPage />} />
         <Route path="faq" element={<FaqAdminPage />} />
         <Route path="auditoria" element={<AuditPage />} />
         <Route path="usuarios" element={<UsersPage />} />
-        <Route path="configuracion" element={<UsersPage />} />
+        <Route path="configuracion" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

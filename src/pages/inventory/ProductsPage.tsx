@@ -1,10 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState, type FormEvent } from 'react'
-import { createProduct } from '../../api/catalogMutations'
+import { Fragment, useState, type FormEvent } from 'react'
+import {
+  createProduct,
+  createVariant,
+  deactivateProduct,
+  deactivateVariant,
+} from '../../api/catalogMutations'
 import { Can } from '../../components/auth/Can'
 import { TypeaheadInput } from '../../components/ui/TypeaheadInput'
 import { useProductsQuery } from '../../hooks/useCatalogQueries'
 import { P } from '../../lib/permissions'
+import type { Product } from '../../types'
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -21,6 +27,7 @@ export function ProductsPage() {
   const [brandId, setBrandId] = useState<number | undefined>()
   const [categoryLabel, setCategoryLabel] = useState('')
   const [brandLabel, setBrandLabel] = useState('')
+  const [expandedId, setExpandedId] = useState<number | null>(null)
 
   const [createName, setCreateName] = useState('')
   const [createCategoryId, setCreateCategoryId] = useState<number | undefined>()
@@ -29,16 +36,28 @@ export function ProductsPage() {
   const [createBrandLabel, setCreateBrandLabel] = useState('')
   const [createError, setCreateError] = useState('')
 
+  const [variantForm, setVariantForm] = useState({
+    sku: '',
+    variantName: '',
+    barcode: '',
+    salePrice: '',
+    costPrice: '',
+    stockOnHand: '0',
+    reorderLevel: '5',
+  })
+
   const { data: products = [], isLoading, isError } = useProductsQuery({
     search: search || undefined,
     categoryId,
     brandId,
   })
 
+  const invalidate = () => void queryClient.invalidateQueries({ queryKey: ['catalog', 'products'] })
+
   const createMutation = useMutation({
     mutationFn: createProduct,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['catalog', 'products'] })
+      invalidate()
       setCreateName('')
       setCreateCategoryId(undefined)
       setCreateBrandId(undefined)
@@ -47,6 +66,32 @@ export function ProductsPage() {
       setCreateError('')
     },
     onError: () => setCreateError('No se pudo crear el producto'),
+  })
+
+  const variantMutation = useMutation({
+    mutationFn: createVariant,
+    onSuccess: () => {
+      invalidate()
+      setVariantForm({
+        sku: '',
+        variantName: '',
+        barcode: '',
+        salePrice: '',
+        costPrice: '',
+        stockOnHand: '0',
+        reorderLevel: '5',
+      })
+    },
+  })
+
+  const deactivateProductMutation = useMutation({
+    mutationFn: deactivateProduct,
+    onSuccess: invalidate,
+  })
+
+  const deactivateVariantMutation = useMutation({
+    mutationFn: deactivateVariant,
+    onSuccess: invalidate,
   })
 
   const handleCreate = (e: FormEvent) => {
@@ -62,11 +107,27 @@ export function ProductsPage() {
     })
   }
 
+  const handleAddVariant = (product: Product) => (e: FormEvent) => {
+    e.preventDefault()
+    variantMutation.mutate({
+      productId: product.productId,
+      sku: variantForm.sku,
+      variantName: variantForm.variantName,
+      barcode: variantForm.barcode || undefined,
+      salePrice: Number(variantForm.salePrice),
+      costPrice: Number(variantForm.costPrice),
+      stockOnHand: Number(variantForm.stockOnHand) || 0,
+      reorderLevel: Number(variantForm.reorderLevel) || 0,
+    })
+  }
+
   return (
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">Productos</h1>
-        <p className="page-subtitle">Catálogo de productos del inventario</p>
+        <p className="page-subtitle">
+          Productos y variantes con precio de venta/costo (Catalog + Inventory)
+        </p>
       </header>
 
       <Can permission={P.Catalog.Create}>
@@ -81,13 +142,11 @@ export function ProductsPage() {
                 required
                 value={createName}
                 onChange={(e) => setCreateName(e.target.value)}
-                placeholder="Ej. Serum vitamina C"
               />
             </div>
             <TypeaheadInput
               entity="categories"
               label="Categoría"
-              placeholder="Buscar categoría..."
               valueLabel={createCategoryLabel}
               onSelect={(item) => {
                 setCreateCategoryId(item.id)
@@ -101,7 +160,6 @@ export function ProductsPage() {
             <TypeaheadInput
               entity="brands"
               label="Marca"
-              placeholder="Buscar marca..."
               valueLabel={createBrandLabel}
               onSelect={(item) => {
                 setCreateBrandId(item.id)
@@ -114,7 +172,7 @@ export function ProductsPage() {
             />
           </div>
           <button type="submit" className="btn btn-primary" disabled={createMutation.isPending}>
-            {createMutation.isPending ? 'Creando...' : 'Crear producto'}
+            Crear producto
           </button>
         </form>
       </Can>
@@ -122,13 +180,12 @@ export function ProductsPage() {
       <div className="page-filters">
         <div className="form-group">
           <label className="form-label" htmlFor="product-search">
-            Buscar producto
+            Buscar
           </label>
           <input
             id="product-search"
             type="search"
             className="form-input"
-            placeholder="Nombre del producto..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -136,7 +193,6 @@ export function ProductsPage() {
         <TypeaheadInput
           entity="categories"
           label="Categoría"
-          placeholder="Filtrar por categoría..."
           valueLabel={categoryLabel}
           onSelect={(item) => {
             setCategoryId(item.id)
@@ -150,7 +206,6 @@ export function ProductsPage() {
         <TypeaheadInput
           entity="brands"
           label="Marca"
-          placeholder="Filtrar por marca..."
           valueLabel={brandLabel}
           onSelect={(item) => {
             setBrandId(item.id)
@@ -182,6 +237,7 @@ export function ProductsPage() {
                 <th>Marca</th>
                 <th>Desde</th>
                 <th>Estado</th>
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -190,21 +246,223 @@ export function ProductsPage() {
                   product.variants?.length > 0
                     ? Math.min(...product.variants.map((v) => v.salePrice))
                     : null
+                const open = expandedId === product.productId
                 return (
-                  <tr key={product.productId}>
-                    <td>{product.name}</td>
-                    <td>{product.variants?.length ?? 0}</td>
-                    <td>{product.categoryName ?? '—'}</td>
-                    <td>{product.brandName ?? '—'}</td>
-                    <td>{price == null ? '—' : formatPrice(price)}</td>
-                    <td>
-                      <span
-                        className={`badge ${product.isActive ? 'badge-success' : 'badge-muted'}`}
-                      >
-                        {product.isActive ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-                  </tr>
+                  <Fragment key={product.productId}>
+                    <tr>
+                      <td>{product.name}</td>
+                      <td>{product.variants?.length ?? 0}</td>
+                      <td>{product.categoryName ?? '—'}</td>
+                      <td>{product.brandName ?? '—'}</td>
+                      <td>{price == null ? '—' : formatPrice(price)}</td>
+                      <td>
+                        <span
+                          className={`badge ${product.isActive ? 'badge-success' : 'badge-muted'}`}
+                        >
+                          {product.isActive ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          onClick={() =>
+                            setExpandedId((prev) =>
+                              prev === product.productId ? null : product.productId,
+                            )
+                          }
+                        >
+                          {open ? 'Ocultar' : 'Precios / variantes'}
+                        </button>
+                        <Can permission={P.Catalog.Delete}>
+                          {product.isActive && (
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              onClick={() => deactivateProductMutation.mutate(product.productId)}
+                            >
+                              Desactivar
+                            </button>
+                          )}
+                        </Can>
+                      </td>
+                    </tr>
+                    {open && (
+                      <tr>
+                        <td colSpan={7}>
+                          <div className="card" style={{ margin: '0.5rem 0' }}>
+                            <h3 className="card-title">Variantes y precios</h3>
+                            {(product.variants ?? []).length === 0 ? (
+                              <p className="page-subtitle">Sin variantes. Agrega precio y stock.</p>
+                            ) : (
+                              <table className="data-table">
+                                <thead>
+                                  <tr>
+                                    <th>SKU</th>
+                                    <th>Variante</th>
+                                    <th>P. venta</th>
+                                    <th>P. costo</th>
+                                    <th>Stock</th>
+                                    <th>Mín.</th>
+                                    <th>Barcode</th>
+                                    <th />
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {product.variants.map((v) => (
+                                    <tr key={v.productVariantId}>
+                                      <td>{v.sku}</td>
+                                      <td>{v.variantName}</td>
+                                      <td>{formatPrice(v.salePrice)}</td>
+                                      <td>{formatPrice(v.costPrice)}</td>
+                                      <td>{v.stockOnHand}</td>
+                                      <td>{v.reorderLevel}</td>
+                                      <td>{v.barcode ?? '—'}</td>
+                                      <td>
+                                        <Can permission={P.Inventory.Delete}>
+                                          {v.isActive && (
+                                            <button
+                                              type="button"
+                                              className="btn btn-ghost btn-sm"
+                                              onClick={() =>
+                                                deactivateVariantMutation.mutate(v.productVariantId)
+                                              }
+                                            >
+                                              Desactivar
+                                            </button>
+                                          )}
+                                        </Can>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            )}
+
+                            <Can permission={P.Inventory.Create}>
+                              <form
+                                onSubmit={handleAddVariant(product)}
+                                style={{ marginTop: '1rem' }}
+                              >
+                                <h4 className="card-title">Agregar variante / precio</h4>
+                                <div className="page-filters">
+                                  <div className="form-group">
+                                    <label className="form-label">SKU</label>
+                                    <input
+                                      className="form-input"
+                                      required
+                                      value={variantForm.sku}
+                                      onChange={(e) =>
+                                        setVariantForm((f) => ({ ...f, sku: e.target.value }))
+                                      }
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label className="form-label">Nombre variante</label>
+                                    <input
+                                      className="form-input"
+                                      required
+                                      value={variantForm.variantName}
+                                      onChange={(e) =>
+                                        setVariantForm((f) => ({
+                                          ...f,
+                                          variantName: e.target.value,
+                                        }))
+                                      }
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label className="form-label">Precio venta</label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      step="0.01"
+                                      className="form-input"
+                                      required
+                                      value={variantForm.salePrice}
+                                      onChange={(e) =>
+                                        setVariantForm((f) => ({
+                                          ...f,
+                                          salePrice: e.target.value,
+                                        }))
+                                      }
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label className="form-label">Precio costo</label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      step="0.01"
+                                      className="form-input"
+                                      required
+                                      value={variantForm.costPrice}
+                                      onChange={(e) =>
+                                        setVariantForm((f) => ({
+                                          ...f,
+                                          costPrice: e.target.value,
+                                        }))
+                                      }
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label className="form-label">Stock</label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      className="form-input"
+                                      value={variantForm.stockOnHand}
+                                      onChange={(e) =>
+                                        setVariantForm((f) => ({
+                                          ...f,
+                                          stockOnHand: e.target.value,
+                                        }))
+                                      }
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label className="form-label">Stock mínimo</label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      className="form-input"
+                                      value={variantForm.reorderLevel}
+                                      onChange={(e) =>
+                                        setVariantForm((f) => ({
+                                          ...f,
+                                          reorderLevel: e.target.value,
+                                        }))
+                                      }
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label className="form-label">Código barras</label>
+                                    <input
+                                      className="form-input"
+                                      value={variantForm.barcode}
+                                      onChange={(e) =>
+                                        setVariantForm((f) => ({
+                                          ...f,
+                                          barcode: e.target.value,
+                                        }))
+                                      }
+                                    />
+                                  </div>
+                                </div>
+                                <button
+                                  type="submit"
+                                  className="btn btn-primary"
+                                  disabled={variantMutation.isPending}
+                                >
+                                  Guardar variante
+                                </button>
+                              </form>
+                            </Can>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 )
               })}
             </tbody>
