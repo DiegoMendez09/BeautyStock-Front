@@ -93,7 +93,22 @@ export async function apiClient<T>(
   return response.json() as Promise<T>
 }
 
-/** Descarga un archivo binario (PDF, CSV, etc.) y dispara la descarga en el navegador. */
+function filenameFromContentDisposition(header: string | null, fallback: string): string {
+  if (!header) return fallback
+  const utf8 = /filename\*=(?:UTF-8''|utf-8'')([^;]+)/i.exec(header)
+  if (utf8?.[1]) {
+    try {
+      return decodeURIComponent(utf8[1].trim().replace(/^"+|"+$/g, ''))
+    } catch {
+      // fall through
+    }
+  }
+  const plain = /filename="((?:\\.|[^"\\])*)"|filename=([^;]+)/i.exec(header)
+  const raw = (plain?.[1] ?? plain?.[2] ?? '').trim().replace(/^"+|"+$/g, '')
+  return raw || fallback
+}
+
+/** Descarga un archivo binario (PDF, Excel, CSV, etc.) y dispara la descarga en el navegador. */
 export async function downloadBlob(path: string, filename: string): Promise<void> {
   let response: Response
   try {
@@ -120,12 +135,16 @@ export async function downloadBlob(path: string, filename: string): Promise<void
     throw new ApiClientError(message, response.status)
   }
 
+  const downloadName = filenameFromContentDisposition(
+    response.headers.get('Content-Disposition'),
+    filename,
+  )
   const blob = await response.blob()
   const url = URL.createObjectURL(blob)
   try {
     const link = document.createElement('a')
     link.href = url
-    link.download = filename
+    link.download = downloadName
     document.body.appendChild(link)
     link.click()
     link.remove()

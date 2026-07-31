@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useState, type ChangeEvent } from 'react'
 import {
   downloadBulkTemplate,
-  uploadBulkCsv,
+  uploadBulkFile,
   type BulkAction,
   type BulkImportResult,
   type BulkModule,
@@ -14,6 +14,9 @@ const ACTION_OPTIONS: { value: BulkAction; label: string }[] = [
   { value: 'deactivate', label: 'Desactivar' },
   { value: 'delete', label: 'Eliminar' },
 ]
+
+const ACCEPT =
+  '.xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv'
 
 interface BulkUploadDialogProps {
   module: BulkModule
@@ -31,14 +34,17 @@ export function BulkUploadDialog({
 }: BulkUploadDialogProps) {
   const [open, setOpen] = useState(false)
   const [action, setAction] = useState<BulkAction>(allowedActions[0] ?? 'create')
-  const [csvText, setCsvText] = useState('')
+  const [file, setFile] = useState<File | null>(null)
   const [result, setResult] = useState<BulkImportResult | null>(null)
   const [error, setError] = useState('')
 
   const actions = ACTION_OPTIONS.filter((o) => allowedActions.includes(o.value))
 
   const importMutation = useMutation({
-    mutationFn: () => uploadBulkCsv(module, action, csvText),
+    mutationFn: () => {
+      if (!file) throw new Error('Selecciona un archivo Excel')
+      return uploadBulkFile(module, action, file)
+    },
     onMutate: () => {
       setError('')
       setResult(null)
@@ -59,12 +65,11 @@ export function BulkUploadDialog({
     },
   })
 
-  const onFile = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const text = await file.text()
-    setCsvText(text)
+  const onFile = (e: ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0] ?? null
+    setFile(selected)
     setResult(null)
+    setError('')
   }
 
   if (!open) {
@@ -86,7 +91,7 @@ export function BulkUploadDialog({
         </button>
       </div>
       <p className="page-subtitle" style={{ marginBottom: '0.75rem' }}>
-        Descarga la plantilla CSV, completa las filas y súbelas. Cada fila se valida por separado.
+        Descarga la plantilla Excel, completa las filas y súbelas. Cada fila se valida por separado.
       </p>
 
       {error && <div className="alert alert-error">{error}</div>}
@@ -110,21 +115,14 @@ export function BulkUploadDialog({
           </select>
         </div>
         <div className="form-group">
-          <label className="form-label">Archivo CSV</label>
-          <input className="form-input" type="file" accept=".csv,text/csv" onChange={onFile} />
+          <label className="form-label">Archivo Excel</label>
+          <input className="form-input" type="file" accept={ACCEPT} onChange={onFile} />
+          {file && (
+            <p className="page-subtitle" style={{ marginTop: '0.35rem', marginBottom: 0 }}>
+              {file.name}
+            </p>
+          )}
         </div>
-      </div>
-
-      <div className="form-group" style={{ marginBottom: '0.75rem' }}>
-        <label className="form-label">Contenido CSV</label>
-        <textarea
-          className="form-input"
-          rows={6}
-          value={csvText}
-          onChange={(e) => setCsvText(e.target.value)}
-          placeholder="Pega aquí el CSV o carga un archivo…"
-          style={{ fontFamily: 'ui-monospace, monospace', fontSize: '0.85rem' }}
-        />
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -134,12 +132,12 @@ export function BulkUploadDialog({
           disabled={templateMutation.isPending}
           onClick={() => templateMutation.mutate()}
         >
-          {templateMutation.isPending ? 'Descargando…' : 'Descargar plantilla'}
+          {templateMutation.isPending ? 'Descargando…' : 'Descargar plantilla Excel'}
         </button>
         <button
           type="button"
           className="btn btn-primary"
-          disabled={importMutation.isPending || !csvText.trim()}
+          disabled={importMutation.isPending || !file}
           onClick={() => importMutation.mutate()}
         >
           {importMutation.isPending ? 'Procesando…' : 'Ejecutar carga'}
