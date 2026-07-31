@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react'
-import { getProducts } from '../../api/catalog'
-import type { Product } from '../../types'
+import { useProductsQuery } from '../../hooks/useCatalogQueries'
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -10,28 +8,8 @@ function formatPrice(value: number): string {
   }).format(value)
 }
 
-function minSalePrice(product: Product): number | null {
-  if (!product.variants?.length) return null
-  return Math.min(...product.variants.map((v) => v.salePrice))
-}
-
 export function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    void (async () => {
-      try {
-        const data = await getProducts()
-        setProducts(data)
-      } catch {
-        setError('No se pudieron cargar los productos')
-      } finally {
-        setLoading(false)
-      }
-    })()
-  }, [])
+  const { data: products = [], isLoading, isError } = useProductsQuery()
 
   return (
     <div className="page">
@@ -40,9 +18,9 @@ export function ProductsPage() {
         <p className="page-subtitle">Catálogo de productos del inventario</p>
       </header>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {isError && <div className="alert alert-error">No se pudieron cargar los productos</div>}
 
-      {loading ? (
+      {isLoading ? (
         <div className="loading-screen" style={{ minHeight: '200px' }}>
           <div className="spinner" />
         </div>
@@ -63,7 +41,10 @@ export function ProductsPage() {
             </thead>
             <tbody>
               {products.map((product) => {
-                const price = minSalePrice(product)
+                const price =
+                  product.variants?.length > 0
+                    ? Math.min(...product.variants.map((v) => v.salePrice))
+                    : null
                 return (
                   <tr key={product.productId}>
                     <td>{product.name}</td>

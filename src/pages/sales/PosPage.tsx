@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { getProductByBarcode } from '../../api/catalog'
-import { createSale } from '../../api/sales'
+import { useCreateSaleMutation } from '../../hooks/useSalesMutations'
 import type { CartLine } from '../../types'
 import './PosPage.css'
 
@@ -17,8 +17,8 @@ export function PosPage() {
   const [cart, setCart] = useState<CartLine[]>([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [checkingOut, setCheckingOut] = useState(false)
   const barcodeRef = useRef<HTMLInputElement>(null)
+  const createSaleMutation = useCreateSaleMutation()
 
   const subtotal = cart.reduce(
     (sum, line) => sum + line.variant.salePrice * line.quantity,
@@ -85,12 +85,11 @@ export function PosPage() {
   const handleCheckout = async () => {
     if (cart.length === 0) return
 
-    setCheckingOut(true)
     setError('')
     setSuccess('')
 
     try {
-      const response = await createSale({
+      const response = await createSaleMutation.mutateAsync({
         lines: cart.map((line) => ({
           productVariantId: line.variant.productVariantId,
           quantity: line.quantity,
@@ -105,8 +104,6 @@ export function PosPage() {
       barcodeRef.current?.focus()
     } catch {
       setError('No se pudo completar la venta')
-    } finally {
-      setCheckingOut(false)
     }
   }
 
@@ -227,10 +224,10 @@ export function PosPage() {
             <button
               type="button"
               className="btn btn-primary"
-              disabled={cart.length === 0 || checkingOut}
+              disabled={cart.length === 0 || createSaleMutation.isPending}
               onClick={() => void handleCheckout()}
             >
-              {checkingOut ? 'Procesando...' : 'Completar venta'}
+              {createSaleMutation.isPending ? 'Procesando...' : 'Completar venta'}
             </button>
             <button
               type="button"

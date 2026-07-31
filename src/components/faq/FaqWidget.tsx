@@ -1,42 +1,15 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
-import { searchFaq } from '../../api/faq'
-import type { FaqSearchResult } from '../../types'
+import { useState, type FormEvent } from 'react'
+import { useFaqSearchQuery } from '../../hooks/useFaqQuery'
 import './FaqWidget.css'
 
 export function FaqWidget() {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<FaqSearchResult[]>([])
-  const [loading, setLoading] = useState(false)
   const [expandedId, setExpandedId] = useState<number | null>(null)
-
-  const performSearch = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setResults([])
-      return
-    }
-
-    setLoading(true)
-    try {
-      const response = await searchFaq(searchQuery.trim())
-      setResults(response)
-    } catch {
-      setResults([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      void performSearch(query)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [query, performSearch])
+  const { data: results = [], isFetching } = useFaqSearchQuery(query, open)
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    void performSearch(query)
   }
 
   return (
@@ -67,15 +40,15 @@ export function FaqWidget() {
             />
           </form>
           <div className="faq-widget__results">
-            {loading && (
+            {isFetching && (
               <div className="faq-widget__loading">
                 <div className="spinner" />
               </div>
             )}
-            {!loading && query && results.length === 0 && (
+            {!isFetching && query && results.length === 0 && (
               <div className="faq-widget__empty">No se encontraron resultados</div>
             )}
-            {!loading &&
+            {!isFetching &&
               results.map((item) => (
                 <div
                   key={item.faqArticleId}
@@ -92,7 +65,7 @@ export function FaqWidget() {
                   )}
                 </div>
               ))}
-            {!loading && !query && (
+            {!isFetching && !query && (
               <div className="faq-widget__empty">
                 Escribe para buscar ayuda sobre el sistema
               </div>

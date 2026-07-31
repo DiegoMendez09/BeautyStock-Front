@@ -1,24 +1,7 @@
-import { useEffect, useState } from 'react'
-import { getCategories } from '../../api/catalog'
-import type { Category } from '../../types'
+import { useCategoriesQuery } from '../../hooks/useCatalogQueries'
 
 export function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    void (async () => {
-      try {
-        const data = await getCategories()
-        setCategories(data)
-      } catch {
-        setError('No se pudieron cargar las categorías')
-      } finally {
-        setLoading(false)
-      }
-    })()
-  }, [])
+  const { data: categories = [], isLoading, isError } = useCategoriesQuery()
 
   return (
     <div className="page">
@@ -27,9 +10,9 @@ export function CategoriesPage() {
         <p className="page-subtitle">Organización del catálogo por categorías</p>
       </header>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {isError && <div className="alert alert-error">No se pudieron cargar las categorías</div>}
 
-      {loading ? (
+      {isLoading ? (
         <div className="loading-screen" style={{ minHeight: '200px' }}>
           <div className="spinner" />
         </div>

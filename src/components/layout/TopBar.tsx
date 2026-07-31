@@ -15,8 +15,10 @@ export function TopBar() {
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    logout()
-    navigate('/login')
+    void (async () => {
+      await logout()
+      navigate('/login')
+    })()
   }
 
   return (

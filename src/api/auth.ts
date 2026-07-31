@@ -10,8 +10,11 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
   return apiClient<LoginResponse>('/api/v1/auth/login', {
     method: 'POST',
     body: credentials,
-    auth: false,
   })
+}
+
+export async function logout(): Promise<void> {
+  await apiClient<void>('/api/v1/auth/logout', { method: 'POST' })
 }
 
 export async function getMe(): Promise<User> {
