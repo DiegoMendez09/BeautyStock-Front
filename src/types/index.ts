@@ -107,3 +107,92 @@ export interface TypeaheadItem {
   label: string
   secondary?: string | null
 }
+
+export interface UserAccount {
+  userAccountId: number
+  fullName: string
+  email: string
+  role: string
+  isActive: boolean
+  lastLoginAt?: string | null
+  createdAt: string
+}
+
+export interface CreateUserRequest {
+  fullName: string
+  email: string
+  password: string
+  role: string
+}
+
+export interface UpdateUserRequest {
+  fullName: string
+  email: string
+  password?: string
+  role: string
+  isActive: boolean
+}
+
+export interface Customer {
+  customerId: number
+  fullName: string
+  documentNumber?: string | null
+  phone?: string | null
+  email?: string | null
+  birthDate?: string | null
+  notes?: string | null
+  loyaltyPoints: number
+  isActive: boolean
+}
+
+export interface CreateCustomerRequest {
+  fullName: string
+  documentNumber?: string
+  phone?: string
+  email?: string
+  notes?: string
+}
+
+export interface UpdateCustomerRequest extends CreateCustomerRequest {
+  isActive: boolean
+}
+
+export interface CreateCategoryRequest {
+  name: string
+  description?: string
+}
+
+export interface UpdateCategoryRequest {
+  name: string
+  description?: string
+  isActive: boolean
+}
+
+export interface CreateProductRequest {
+  categoryId: number
+  brandId: number
+  name: string
+  description?: string
+}
+
+export interface NotificationItem {
+  notificationId: number
+  notificationType: string
+  title: string
+  message: string
+  severity: string
+  isRead: boolean
+  referenceType?: string | null
+  referenceId?: number | null
+  createdAt: string
+}
+
+export interface LoginLogItem {
+  loginLogId: number
+  userAccountId?: number | null
+  emailAttempted: string
+  isSuccess: boolean
+  failureReason?: string | null
+  ipAddress?: string | null
+  attemptedAt: string
+}

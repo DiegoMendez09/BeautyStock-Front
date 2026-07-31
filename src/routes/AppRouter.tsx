@@ -8,6 +8,7 @@ import { FaqAdminPage } from '../pages/faq/FaqAdminPage'
 import { CategoriesPage } from '../pages/inventory/CategoriesPage'
 import { ProductsPage } from '../pages/inventory/ProductsPage'
 import { LoginPage } from '../pages/LoginPage'
+import { NotificationsPage } from '../pages/notifications/NotificationsPage'
 import { ReportsPage } from '../pages/reports/ReportsPage'
 import { PosPage } from '../pages/sales/PosPage'
 import { UsersPage } from '../pages/users/UsersPage'
@@ -49,7 +50,7 @@ export function AppRouter() {
         <Route path="clientes" element={<CustomersPage />} />
         <Route path="compras" element={<ReportsPage />} />
         <Route path="reportes" element={<ReportsPage />} />
-        <Route path="notificaciones" element={<DashboardPage />} />
+        <Route path="notificaciones" element={<NotificationsPage />} />
         <Route path="faq" element={<FaqAdminPage />} />
         <Route path="auditoria" element={<AuditPage />} />
         <Route path="usuarios" element={<UsersPage />} />
