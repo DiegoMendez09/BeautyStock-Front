@@ -34,8 +34,8 @@ export function TopBar({ collapsed, onToggleSidebar }: TopBarProps) {
           type="button"
           className="topbar__toggle"
           onClick={onToggleSidebar}
-          aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
-          title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+          aria-label={collapsed ? 'Abrir menú de navegación' : 'Cerrar menú de navegación'}
+          title={collapsed ? 'Abrir menú' : 'Cerrar menú'}
         >
           ☰
         </button>

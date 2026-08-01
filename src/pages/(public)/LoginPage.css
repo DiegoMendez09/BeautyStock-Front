@@ -156,12 +156,29 @@
 }
 
 @media (max-width: 768px) {
+  .login-page {
+    align-items: stretch;
+  }
+
   .login-page__content {
     grid-template-columns: 1fr;
     max-width: 420px;
+    min-height: auto;
+    margin: var(--space-md);
+    align-self: center;
   }
 
   .login-page__hero {
     display: none;
+  }
+
+  .login-page__form-panel {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .login-page__store-link {
+    min-height: var(--touch-target-min);
+    display: inline-flex;
+    align-items: center;
   }
 }

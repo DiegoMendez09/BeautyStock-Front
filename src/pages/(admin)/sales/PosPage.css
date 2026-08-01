@@ -107,4 +107,13 @@
   .pos-page {
     grid-template-columns: 1fr;
   }
+
+  .pos-cart__line {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .pos-summary__actions .btn {
+    min-height: var(--touch-target-min);
+  }
 }

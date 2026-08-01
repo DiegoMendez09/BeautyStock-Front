@@ -13,11 +13,11 @@ import {
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
 import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
+import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { TypeaheadInput } from '../../../components/ui/TypeaheadInput'
 import { P } from '../../../lib/permissions'
-
 type Tab = 'orders' | 'new-order' | 'suppliers'
 
 /** Cómo se elige qué se compra en la línea. */
@@ -258,7 +258,7 @@ export function PurchasesPage() {
 
   const renderOrderLines = (order: PurchaseOrder) => (
     <tr>
-      <td colSpan={6} style={{ background: 'var(--color-surface-muted)', padding: '1rem' }}>
+      <td colSpan={6} className="data-table__expand" style={{ background: 'var(--color-surface-muted)', padding: '1rem' }}>
         <div className="card" style={{ margin: 0, boxShadow: 'none' }}>
           <h3 className="card-title" style={{ fontSize: '1rem' }}>
             Líneas de {order.orderNumber}
@@ -266,28 +266,30 @@ export function PurchasesPage() {
           {(order.lines?.length ?? 0) === 0 ? (
             <p className="page-subtitle">Sin líneas</p>
           ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>SKU</th>
-                  <th>Presentación</th>
-                  <th>Cantidad</th>
-                  <th>Costo unit.</th>
-                  <th>Total línea</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.lines.map((line) => (
-                  <tr key={line.purchaseOrderLineId}>
-                    <td>{line.sku}</td>
-                    <td>{line.variantName}</td>
-                    <td>{line.quantity}</td>
-                    <td>{formatPrice(line.unitCost)}</td>
-                    <td>{formatPrice(line.lineTotal)}</td>
+            <DataList label={`Líneas de ${order.orderNumber}`}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>SKU</th>
+                    <th>Presentación</th>
+                    <th>Cantidad</th>
+                    <th>Costo unit.</th>
+                    <th>Total línea</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {order.lines.map((line) => (
+                    <tr key={line.purchaseOrderLineId}>
+                      <td data-label="SKU">{line.sku}</td>
+                      <td data-label="Presentación">{line.variantName}</td>
+                      <td data-label="Cantidad">{line.quantity}</td>
+                      <td data-label="Costo unit.">{formatPrice(line.unitCost)}</td>
+                      <td data-label="Total línea">{formatPrice(line.lineTotal)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </DataList>
           )}
           {order.notes && (
             <p className="page-subtitle" style={{ marginTop: '0.75rem' }}>
@@ -390,7 +392,7 @@ export function PurchasesPage() {
             <div className="empty-state">No hay órdenes de compra</div>
           ) : (
             <>
-              <div className="table-wrapper">
+              <DataList label="Órdenes de compra">
                 <table className="data-table">
                   <thead>
                     <tr>
@@ -399,7 +401,7 @@ export function PurchasesPage() {
                       <th>Estado</th>
                       <th>Total</th>
                       <th>Fecha</th>
-                      <th />
+                      <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -408,16 +410,16 @@ export function PurchasesPage() {
                       return (
                         <Fragment key={order.purchaseOrderId}>
                           <tr>
-                            <td>{order.orderNumber}</td>
-                            <td>{order.supplierName}</td>
-                            <td>
+                            <td data-label="Orden">{order.orderNumber}</td>
+                            <td data-label="Proveedor">{order.supplierName}</td>
+                            <td data-label="Estado">
                               <span className={statusBadge(order.status)}>
                                 {statusLabel(order.status)}
                               </span>
                             </td>
-                            <td>{formatPrice(order.totalAmount)}</td>
-                            <td>{new Date(order.orderedAt).toLocaleString('es-PE')}</td>
-                            <td style={{ whiteSpace: 'nowrap' }}>
+                            <td data-label="Total">{formatPrice(order.totalAmount)}</td>
+                            <td data-label="Fecha">{new Date(order.orderedAt).toLocaleString('es-PE')}</td>
+                            <td data-label="" className="data-table__actions" style={{ whiteSpace: 'nowrap' }}>
                               <button
                                 type="button"
                                 className="btn btn-ghost btn-sm"
@@ -448,7 +450,7 @@ export function PurchasesPage() {
                     })}
                   </tbody>
                 </table>
-              </div>
+              </DataList>
               {orderData && (
                 <PaginationBar
                   page={orderData.page}
@@ -800,7 +802,7 @@ export function PurchasesPage() {
             </form>
           </Can>
 
-          <div className="table-wrapper" style={{ marginBottom: '0.5rem' }}>
+          <DataList label="Proveedores" style={{ marginBottom: '0.5rem' }}>
             <table className="data-table">
               <thead>
                 <tr>
@@ -808,23 +810,23 @@ export function PurchasesPage() {
                   <th>Correo</th>
                   <th>Teléfono</th>
                   <th>Estado</th>
-                  <th />
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {suppliers.map((supplier) => (
                   <tr key={supplier.supplierId}>
-                    <td>{supplier.legalName}</td>
-                    <td>{supplier.email ?? '—'}</td>
-                    <td>{supplier.phone ?? '—'}</td>
-                    <td>
+                    <td data-label="Razón social">{supplier.legalName}</td>
+                    <td data-label="Correo">{supplier.email ?? '—'}</td>
+                    <td data-label="Teléfono">{supplier.phone ?? '—'}</td>
+                    <td data-label="Estado">
                       <span
                         className={`badge ${supplier.isActive ? 'badge-success' : 'badge-muted'}`}
                       >
                         {supplier.isActive ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="" className="data-table__actions">
                       <Can permission={P.Purchases.Delete}>
                         <RowActions
                           isActive={supplier.isActive}
@@ -841,7 +843,7 @@ export function PurchasesPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </DataList>
           {supplierData && (
             <PaginationBar
               page={supplierData.page}

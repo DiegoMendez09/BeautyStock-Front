@@ -88,6 +88,9 @@
   --sidebar-collapsed-width: 4.25rem;
   --topbar-height: 56px;
   --content-max-width: 1200px;
+  --bp-tablet: 900px;
+  --bp-mobile: 720px;
+  --bp-narrow: 480px;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;

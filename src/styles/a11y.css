@@ -71,14 +71,29 @@ textarea:focus-visible,
 
 /* Controles táctiles mínimos (2.5.5 recomendado / usabilidad) */
 .btn,
-.btn-sm,
 .form-input,
-.pagination-bar__nav .btn {
+.pagination-bar__nav .btn,
+.tab,
+.ml-header__cart,
+.ml-header__user,
+.ml-search__btn,
+.faq-chip,
+.faq-widget__new,
+.faq-widget__send,
+.faq-product-card__add {
   min-height: var(--touch-target-min);
 }
 
 .btn-sm {
   min-height: 2.25rem;
+}
+
+@media (max-width: 720px) {
+  .btn-sm,
+  .row-actions .btn {
+    min-height: var(--touch-target-min);
+    padding-inline: 0.85rem;
+  }
 }
 
 /* Contenido principal anclable */

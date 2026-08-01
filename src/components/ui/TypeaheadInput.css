@@ -80,9 +80,4 @@
   color: var(--color-text-muted);
 }
 
-.page-filters {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
-}
+/* .page-filters definido en global.css */

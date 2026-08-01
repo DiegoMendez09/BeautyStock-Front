@@ -104,7 +104,11 @@ export function CartPage() {
                   </div>
                 </div>
                 <div className="cart-line__actions" style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+                  <label className="sr-only" htmlFor={`cart-qty-${item.productVariantId}`}>
+                    Cantidad de {item.productName}
+                  </label>
                   <input
+                    id={`cart-qty-${item.productVariantId}`}
                     type="number"
                     className="form-input"
                     style={{ width: 72 }}
@@ -117,6 +121,7 @@ export function CartPage() {
                     type="button"
                     className="btn btn-ghost btn-sm"
                     onClick={() => removeItem(item.productVariantId)}
+                    aria-label={`Quitar ${item.productName} del carrito`}
                   >
                     Quitar
                   </button>

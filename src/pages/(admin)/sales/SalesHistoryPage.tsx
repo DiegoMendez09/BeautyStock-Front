@@ -3,10 +3,10 @@ import { useState } from 'react'
 import { downloadSalePdf, downloadSalesExportPdf, getSales } from '../../../api/sales'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
+import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { paymentMethodLabel, saleStatusLabel } from '../../../lib/labels'
 import { P } from '../../../lib/permissions'
-
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
@@ -157,7 +157,7 @@ export function SalesHistoryPage() {
         <div className="empty-state">No hay ventas registradas en este rango</div>
       ) : (
         <>
-          <div className="table-wrapper">
+          <DataList label="Historial de ventas">
             <table className="data-table">
               <thead>
                 <tr>
@@ -173,17 +173,17 @@ export function SalesHistoryPage() {
               <tbody>
                 {sales.map((sale) => (
                   <tr key={sale.saleId}>
-                    <td>{sale.ticketNumber}</td>
-                    <td>{new Date(sale.soldAt).toLocaleString('es-PE')}</td>
-                    <td>{sale.soldByFullName}</td>
-                    <td>{paymentMethodLabel(sale.paymentMethod)}</td>
-                    <td>{formatPrice(sale.totalAmount)}</td>
-                    <td>
+                    <td data-label="Comprobante">{sale.ticketNumber}</td>
+                    <td data-label="Fecha">{new Date(sale.soldAt).toLocaleString('es-PE')}</td>
+                    <td data-label="Vendedor">{sale.soldByFullName}</td>
+                    <td data-label="Pago">{paymentMethodLabel(sale.paymentMethod)}</td>
+                    <td data-label="Total">{formatPrice(sale.totalAmount)}</td>
+                    <td data-label="Estado">
                       <span className={statusBadge(sale.status)}>
                         {saleStatusLabel(sale.status)}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="" className="data-table__actions">
                       <Can permission={P.Sales.View}>
                         <button
                           type="button"
@@ -204,7 +204,7 @@ export function SalesHistoryPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </DataList>
           {data && (
             <PaginationBar
               page={data.page}

@@ -17,10 +17,10 @@ import {
 } from '../../../api/ops'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
+import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { useAuth } from '../../../hooks/useAuth'
 import { P } from '../../../lib/permissions'
-
 type AuditTab = 'logins' | 'audit' | 'application' | 'faq-chat'
 
 function toIsoStart(date: string): string | undefined {
@@ -432,7 +432,7 @@ function LoginTable({
   }
 
   return (
-    <div className="table-wrapper">
+    <DataList label="Intentos de inicio de sesión">
       <table className="data-table">
         <thead>
           <tr>
@@ -442,23 +442,23 @@ function LoginTable({
             <th>Resultado</th>
             <th>Motivo</th>
             <th>IP</th>
-            <th />
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {items.map((log) => (
             <tr key={log.loginLogId}>
-              <td>{new Date(log.attemptedAt).toLocaleString('es-PE')}</td>
-              <td>{log.emailAttempted}</td>
-              <td>{log.userFullName ?? '—'}</td>
-              <td>
+              <td data-label="Fecha">{new Date(log.attemptedAt).toLocaleString('es-PE')}</td>
+              <td data-label="Correo">{log.emailAttempted}</td>
+              <td data-label="Usuario">{log.userFullName ?? '—'}</td>
+              <td data-label="Resultado">
                 <span className={`badge ${log.isSuccess ? 'badge-success' : 'badge-muted'}`}>
                   {log.isSuccess ? 'Correcto' : 'Fallido'}
                 </span>
               </td>
-              <td>{log.failureReason ?? '—'}</td>
-              <td>{log.ipAddress ?? '—'}</td>
-              <td>
+              <td data-label="Motivo">{log.failureReason ?? '—'}</td>
+              <td data-label="IP">{log.ipAddress ?? '—'}</td>
+              <td data-label="" className="data-table__actions">
                 <button
                   type="button"
                   className="btn btn-secondary"
@@ -472,7 +472,7 @@ function LoginTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </DataList>
   )
 }
 
@@ -490,7 +490,7 @@ function AuditTable({
   }
 
   return (
-    <div className="table-wrapper">
+    <DataList label="Acciones de auditoría">
       <table className="data-table">
         <thead>
           <tr>
@@ -501,20 +501,20 @@ function AuditTable({
             <th>Id.</th>
             <th>Módulo</th>
             <th>IP</th>
-            <th />
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {items.map((log) => (
             <tr key={log.auditLogId}>
-              <td>{new Date(log.createdAt).toLocaleString('es-PE')}</td>
-              <td>{log.userFullName ?? (log.userAccountId ? `#${log.userAccountId}` : '—')}</td>
-              <td>{log.action}</td>
-              <td>{log.entityName}</td>
-              <td>{log.entityId}</td>
-              <td>{log.moduleCode ?? '—'}</td>
-              <td>{log.ipAddress ?? '—'}</td>
-              <td>
+              <td data-label="Fecha">{new Date(log.createdAt).toLocaleString('es-PE')}</td>
+              <td data-label="Usuario">{log.userFullName ?? (log.userAccountId ? `#${log.userAccountId}` : '—')}</td>
+              <td data-label="Acción">{log.action}</td>
+              <td data-label="Entidad">{log.entityName}</td>
+              <td data-label="Id.">{log.entityId}</td>
+              <td data-label="Módulo">{log.moduleCode ?? '—'}</td>
+              <td data-label="IP">{log.ipAddress ?? '—'}</td>
+              <td data-label="" className="data-table__actions">
                 <button
                   type="button"
                   className="btn btn-secondary"
@@ -528,7 +528,7 @@ function AuditTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </DataList>
   )
 }
 
@@ -546,7 +546,7 @@ function ApplicationTable({
   }
 
   return (
-    <div className="table-wrapper">
+    <DataList label="Eventos de aplicación">
       <table className="data-table">
         <thead>
           <tr>
@@ -557,14 +557,14 @@ function ApplicationTable({
             <th>Ruta</th>
             <th>Estado</th>
             <th>Usuario</th>
-            <th />
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {items.map((log) => (
             <tr key={log.applicationLogId}>
-              <td>{new Date(log.createdAt).toLocaleString('es-PE')}</td>
-              <td>
+              <td data-label="Fecha">{new Date(log.createdAt).toLocaleString('es-PE')}</td>
+              <td data-label="Nivel">
                 <span
                   className={`badge ${
                     log.level === 'Error' || log.level === 'Warning'
@@ -575,15 +575,15 @@ function ApplicationTable({
                   {log.level}
                 </span>
               </td>
-              <td>{log.message}</td>
-              <td>{log.source ?? '—'}</td>
-              <td>
+              <td data-label="Mensaje">{log.message}</td>
+              <td data-label="Origen">{log.source ?? '—'}</td>
+              <td data-label="Ruta">
                 {log.httpMethod ? `${log.httpMethod} ` : ''}
                 {log.requestPath ?? '—'}
               </td>
-              <td>{log.statusCode ?? '—'}</td>
-              <td>{log.userFullName ?? '—'}</td>
-              <td>
+              <td data-label="Estado">{log.statusCode ?? '—'}</td>
+              <td data-label="Usuario">{log.userFullName ?? '—'}</td>
+              <td data-label="" className="data-table__actions">
                 <button
                   type="button"
                   className="btn btn-secondary"
@@ -597,7 +597,7 @@ function ApplicationTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </DataList>
   )
 }
 
@@ -615,7 +615,7 @@ function FaqChatTable({
   }
 
   return (
-    <div className="table-wrapper">
+    <DataList label="Consultas del asistente">
       <table className="data-table">
         <thead>
           <tr>
@@ -626,24 +626,24 @@ function FaqChatTable({
             <th>Artículos</th>
             <th>Productos</th>
             <th>IP</th>
-            <th />
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {items.map((log) => (
             <tr key={log.faqChatLogId}>
-              <td>{new Date(log.createdAt).toLocaleString('es-PE')}</td>
-              <td>{log.userFullName ?? 'Anónimo'}</td>
-              <td>
+              <td data-label="Fecha">{new Date(log.createdAt).toLocaleString('es-PE')}</td>
+              <td data-label="Usuario">{log.userFullName ?? 'Anónimo'}</td>
+              <td data-label="Sesión">
                 <code style={{ fontSize: '0.8em' }}>
                   {log.sessionId ? `${log.sessionId.slice(0, 8)}…` : '—'}
                 </code>
               </td>
-              <td>{log.queryText}</td>
-              <td>{log.matchedArticlesCount}</td>
-              <td>{log.matchedProductsCount}</td>
-              <td>{log.ipAddress ?? '—'}</td>
-              <td>
+              <td data-label="Consulta">{log.queryText}</td>
+              <td data-label="Artículos">{log.matchedArticlesCount}</td>
+              <td data-label="Productos">{log.matchedProductsCount}</td>
+              <td data-label="IP">{log.ipAddress ?? '—'}</td>
+              <td data-label="" className="data-table__actions">
                 <button
                   type="button"
                   className="btn btn-secondary"
@@ -657,6 +657,6 @@ function FaqChatTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </DataList>
   )
 }

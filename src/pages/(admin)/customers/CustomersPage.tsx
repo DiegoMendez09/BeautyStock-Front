@@ -9,10 +9,10 @@ import {
 } from '../../../api/customers'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
+import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { useAuth } from '../../../hooks/useAuth'
-
 export function CustomersPage() {
   const { hasPermission } = useAuth()
   const canCreate = hasPermission('Customers.Create')
@@ -131,7 +131,7 @@ export function CustomersPage() {
         <div className="empty-state">No hay clientes registrados</div>
       ) : (
         <>
-          <div className="table-wrapper">
+          <DataList label="Lista de clientes">
             <table className="data-table">
               <thead>
                 <tr>
@@ -140,23 +140,23 @@ export function CustomersPage() {
                   <th>Teléfono</th>
                   <th>Puntos</th>
                   <th>Estado</th>
-                  {(canUpdate || canDelete) && <th />}
+                  {(canUpdate || canDelete) && <th>Acciones</th>}
                 </tr>
               </thead>
               <tbody>
                 {customers.map((customer) => (
                   <tr key={customer.customerId}>
-                    <td>{customer.fullName}</td>
-                    <td>{customer.email ?? '—'}</td>
-                    <td>{customer.phone ?? '—'}</td>
-                    <td>{customer.loyaltyPoints}</td>
-                    <td>
+                    <td data-label="Nombre">{customer.fullName}</td>
+                    <td data-label="Correo">{customer.email ?? '—'}</td>
+                    <td data-label="Teléfono">{customer.phone ?? '—'}</td>
+                    <td data-label="Puntos">{customer.loyaltyPoints}</td>
+                    <td data-label="Estado">
                       <span className={`badge ${customer.isActive ? 'badge-success' : 'badge-muted'}`}>
                         {customer.isActive ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
                     {(canUpdate || canDelete) && (
-                      <td>
+                      <td data-label="" className="data-table__actions">
                         <RowActions
                           isActive={customer.isActive}
                           canDeactivate={canDelete}
@@ -190,7 +190,7 @@ export function CustomersPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </DataList>
           {data && (
             <PaginationBar
               page={data.page}

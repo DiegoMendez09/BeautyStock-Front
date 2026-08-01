@@ -207,34 +207,63 @@ function ChatPanel({ variant }: { variant: 'admin' | 'store' }) {
     <>
       <button
         type="button"
-        className={`faq-widget__toggle${variant === 'store' ? ' faq-widget__toggle--store' : ''}`}
+        className={[
+          'faq-widget__toggle',
+          variant === 'store' ? 'faq-widget__toggle--store' : '',
+          open ? 'faq-widget__toggle--open' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
         onClick={() => setOpen((prev) => !prev)}
-        aria-label={open ? 'Cerrar asistente' : 'Asistente de ayuda'}
+        aria-label={open ? 'Cerrar asistente' : 'Abrir asistente de ayuda'}
         title="Asistente BeautyStock"
         aria-expanded={open}
+        aria-controls="faq-chat-panel"
       >
         <ChatToggleIcon open={open} />
       </button>
 
       {open && (
-        <div
-          className={`faq-widget__panel${variant === 'store' ? ' faq-widget__panel--store' : ''}`}
-          role="dialog"
-          aria-label="Chat de ayuda"
-        >
+        <>
+          <button
+            type="button"
+            className={`faq-widget__backdrop${variant === 'store' ? ' faq-widget__backdrop--store' : ''}`}
+            aria-label="Cerrar asistente"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            id="faq-chat-panel"
+            className={`faq-widget__panel${variant === 'store' ? ' faq-widget__panel--store' : ''}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Chat de ayuda"
+          >
           <div className="faq-widget__header">
             <div>
               <h3 className="faq-widget__title">Asistente BeautyStock</h3>
               <p className="faq-widget__status">{busy ? 'Buscando…' : 'En línea'}</p>
             </div>
-            <button
-              type="button"
-              className="faq-widget__new"
-              onClick={handleNewConversation}
-              title="Nueva conversación"
-            >
-              Nueva conversación
-            </button>
+            <div className="faq-widget__header-actions">
+              <button
+                type="button"
+                className="faq-widget__new"
+                onClick={handleNewConversation}
+                title="Nueva conversación"
+              >
+                Nueva conversación
+              </button>
+              <button
+                type="button"
+                className="faq-widget__close"
+                onClick={() => setOpen(false)}
+                aria-label="Cerrar asistente"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden focusable="false">
+                  <path d="M18 6 6 18" strokeLinecap="round" />
+                  <path d="m6 6 12 12" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div className="faq-widget__messages" ref={listRef}>
@@ -301,7 +330,8 @@ function ChatPanel({ variant }: { variant: 'admin' | 'store' }) {
               Enviar
             </button>
           </form>
-        </div>
+          </div>
+        </>
       )}
     </>
   )

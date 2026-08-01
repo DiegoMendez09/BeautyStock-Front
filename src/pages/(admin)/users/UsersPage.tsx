@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { createUser, deactivateUser, deleteUser, getRoles, getUsers, updateUser } from '../../../api/users'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
+import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { PasswordInput } from '../../../components/ui/PasswordInput'
 import { RowActions } from '../../../components/ui/RowActions'
@@ -10,7 +11,6 @@ import { useAuth } from '../../../hooks/useAuth'
 import { roleLabel } from '../../../lib/labels'
 import { P } from '../../../lib/permissions'
 import type { UserAccount } from '../../../types'
-
 export function UsersPage() {
   const { hasPermission } = useAuth()
   const canManage = hasPermission(P.Users.Manage)
@@ -142,7 +142,7 @@ export function UsersPage() {
         </div>
       ) : (
         <>
-          <div className="table-wrapper">
+          <DataList label="Lista de usuarios">
             <table className="data-table">
               <thead>
                 <tr>
@@ -150,21 +150,21 @@ export function UsersPage() {
                   <th>Correo</th>
                   <th>Rol</th>
                   <th>Estado</th>
-                  <th />
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user) => (
                   <tr key={user.userAccountId}>
-                    <td>{user.fullName}</td>
-                    <td>{user.email}</td>
-                    <td>{roleLabel(user.role)}</td>
-                    <td>
+                    <td data-label="Nombre">{user.fullName}</td>
+                    <td data-label="Correo">{user.email}</td>
+                    <td data-label="Rol">{roleLabel(user.role)}</td>
+                    <td data-label="Estado">
                       <span className={`badge ${user.isActive ? 'badge-success' : 'badge-muted'}`}>
                         {user.isActive ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="" className="data-table__actions">
                       <Can permission={P.Users.Manage}>
                         <button
                           type="button"
@@ -186,7 +186,7 @@ export function UsersPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </DataList>
           {data && (
             <PaginationBar
               page={data.page}

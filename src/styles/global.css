@@ -1,5 +1,6 @@
 @import './tokens.css';
 @import './a11y.css';
+@import '../components/ui/DataList.css';
 
 *,
 *::before,
@@ -122,10 +123,19 @@ textarea {
 }
 
 .btn-icon {
-  width: 2rem;
-  height: 2rem;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
   padding: 0;
   border-radius: var(--radius-sm);
+}
+
+.btn-icon.btn-sm {
+  width: 2.25rem;
+  height: 2.25rem;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
 }
 
 /* ——— Formularios ——— */
@@ -307,6 +317,13 @@ textarea {
   font-size: var(--font-size-base);
 }
 
+.page-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
 @media (max-width: 768px) {
   .page {
     padding: var(--space-md);
@@ -333,11 +350,33 @@ textarea {
   .card {
     padding: var(--space-md);
   }
+
+  .page-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs {
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: thin;
+  }
+
+  .tab {
+    flex: 0 0 auto;
+    min-height: var(--touch-target-min);
+    padding: 0.65rem 1rem;
+  }
 }
 
 @media (max-width: 480px) {
   .kpi-grid {
     grid-template-columns: 1fr;
+  }
+
+  .page {
+    padding: var(--space-sm) var(--space-md) var(--space-lg);
   }
 }
 

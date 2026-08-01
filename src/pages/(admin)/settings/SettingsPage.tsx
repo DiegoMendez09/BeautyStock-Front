@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getSettingsOverview } from '../../../api/modules'
+import { DataList } from '../../../components/ui/DataList'
 import { roleLabel } from '../../../lib/labels'
-
 export function SettingsPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['settings', 'overview'],
@@ -34,46 +34,50 @@ export function SettingsPage() {
 
           <div className="card" style={{ marginBottom: '1rem' }}>
             <h2 className="card-title">Módulos</h2>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Nombre</th>
-                  <th>Ruta</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.modules.map((m) => (
-                  <tr key={m.moduleId}>
-                    <td>{m.code}</td>
-                    <td>{m.name}</td>
-                    <td>{m.routePath ?? '—'}</td>
-                    <td>{m.isActive ? 'Activo' : 'Inactivo'}</td>
+            <DataList label="Módulos del sistema">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Ruta</th>
+                    <th>Estado</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {data.modules.map((m) => (
+                    <tr key={m.moduleId}>
+                      <td data-label="Código">{m.code}</td>
+                      <td data-label="Nombre">{m.name}</td>
+                      <td data-label="Ruta">{m.routePath ?? '—'}</td>
+                      <td data-label="Estado">{m.isActive ? 'Activo' : 'Inactivo'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </DataList>
           </div>
 
           <div className="card">
             <h2 className="card-title">Permisos por rol (extracto)</h2>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Rol</th>
-                  <th>Permiso</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.rolePermissions.slice(0, 80).map((rp, i) => (
-                  <tr key={`${rp.role}-${rp.permissionCode}-${i}`}>
-                    <td>{roleLabel(rp.role)}</td>
-                    <td>{rp.permissionCode}</td>
+            <DataList label="Permisos por rol">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Rol</th>
+                    <th>Permiso</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {data.rolePermissions.slice(0, 80).map((rp, i) => (
+                    <tr key={`${rp.role}-${rp.permissionCode}-${i}`}>
+                      <td data-label="Rol">{roleLabel(rp.role)}</td>
+                      <td data-label="Permiso">{rp.permissionCode}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </DataList>
           </div>
         </>
       )}

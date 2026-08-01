@@ -10,12 +10,12 @@ import {
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
 import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
+import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { TypeaheadInput } from '../../../components/ui/TypeaheadInput'
 import { useProductsQuery } from '../../../hooks/useCatalogQueries'
 import { P } from '../../../lib/permissions'
-
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
@@ -159,7 +159,7 @@ export function ProductsPage() {
       ) : products.length === 0 ? (
         <div className="empty-state">No hay productos registrados</div>
       ) : (
-        <div className="table-wrapper">
+        <DataList label="Lista de productos">
           <table className="data-table">
             <thead>
               <tr>
@@ -169,7 +169,7 @@ export function ProductsPage() {
                 <th>Marca</th>
                 <th>Desde</th>
                 <th>Estado</th>
-                <th />
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -182,19 +182,19 @@ export function ProductsPage() {
                 return (
                   <Fragment key={product.productId}>
                     <tr>
-                      <td>{product.name}</td>
-                      <td>{product.variants?.length ?? 0}</td>
-                      <td>{product.categoryName ?? '—'}</td>
-                      <td>{product.brandName ?? '—'}</td>
-                      <td>{price == null ? '—' : formatPrice(price)}</td>
-                      <td>
+                      <td data-label="Nombre">{product.name}</td>
+                      <td data-label="Presentaciones">{product.variants?.length ?? 0}</td>
+                      <td data-label="Categoría">{product.categoryName ?? '—'}</td>
+                      <td data-label="Marca">{product.brandName ?? '—'}</td>
+                      <td data-label="Desde">{price == null ? '—' : formatPrice(price)}</td>
+                      <td data-label="Estado">
                         <span
                           className={`badge ${product.isActive ? 'badge-success' : 'badge-muted'}`}
                         >
                           {product.isActive ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td>
+                      <td data-label="" className="data-table__actions">
                         <button
                           type="button"
                           className="btn btn-ghost btn-sm"
@@ -219,7 +219,7 @@ export function ProductsPage() {
                     </tr>
                     {open && (
                       <tr>
-                        <td colSpan={7}>
+                        <td colSpan={7} className="data-table__expand">
                           <div className="card" style={{ margin: '0.5rem 0' }}>
                             <h3 className="card-title">Presentaciones y precios</h3>
                             {(product.variants ?? []).length === 0 ? (
@@ -227,48 +227,50 @@ export function ProductsPage() {
                                 Sin presentaciones. Agrégalas al crear una compra al proveedor.
                               </p>
                             ) : (
-                              <table className="data-table">
-                                <thead>
-                                  <tr>
-                                    <th>SKU</th>
-                                    <th>Presentación</th>
-                                    <th>P. venta</th>
-                                    <th>P. costo</th>
-                                    <th>Existencias</th>
-                                    <th>Mín.</th>
-                                    <th>Código de barras</th>
-                                    <th />
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {product.variants.map((v) => (
-                                    <tr key={v.productVariantId}>
-                                      <td>{v.sku}</td>
-                                      <td>{v.variantName}</td>
-                                      <td>{formatPrice(v.salePrice)}</td>
-                                      <td>{formatPrice(v.costPrice)}</td>
-                                      <td>{v.stockOnHand}</td>
-                                      <td>{v.reorderLevel}</td>
-                                      <td>{v.barcode ?? '—'}</td>
-                                      <td>
-                                        <Can permission={P.Inventory.Delete}>
-                                          <RowActions
-                                            isActive={v.isActive}
-                                            onDeactivate={() =>
-                                              deactivateVariantMutation.mutate(v.productVariantId)
-                                            }
-                                            onDelete={() =>
-                                              deleteVariantMutation.mutate(v.productVariantId)
-                                            }
-                                            deactivatePending={deactivateVariantMutation.isPending}
-                                            deletePending={deleteVariantMutation.isPending}
-                                          />
-                                        </Can>
-                                      </td>
+                              <DataList label={`Presentaciones de ${product.name}`}>
+                                <table className="data-table">
+                                  <thead>
+                                    <tr>
+                                      <th>SKU</th>
+                                      <th>Presentación</th>
+                                      <th>P. venta</th>
+                                      <th>P. costo</th>
+                                      <th>Existencias</th>
+                                      <th>Mín.</th>
+                                      <th>Código de barras</th>
+                                      <th>Acciones</th>
                                     </tr>
-                                  ))}
-                                </tbody>
-                              </table>
+                                  </thead>
+                                  <tbody>
+                                    {product.variants.map((v) => (
+                                      <tr key={v.productVariantId}>
+                                        <td data-label="SKU">{v.sku}</td>
+                                        <td data-label="Presentación">{v.variantName}</td>
+                                        <td data-label="P. venta">{formatPrice(v.salePrice)}</td>
+                                        <td data-label="P. costo">{formatPrice(v.costPrice)}</td>
+                                        <td data-label="Existencias">{v.stockOnHand}</td>
+                                        <td data-label="Mín.">{v.reorderLevel}</td>
+                                        <td data-label="Código de barras">{v.barcode ?? '—'}</td>
+                                        <td data-label="" className="data-table__actions">
+                                          <Can permission={P.Inventory.Delete}>
+                                            <RowActions
+                                              isActive={v.isActive}
+                                              onDeactivate={() =>
+                                                deactivateVariantMutation.mutate(v.productVariantId)
+                                              }
+                                              onDelete={() =>
+                                                deleteVariantMutation.mutate(v.productVariantId)
+                                              }
+                                              deactivatePending={deactivateVariantMutation.isPending}
+                                              deletePending={deleteVariantMutation.isPending}
+                                            />
+                                          </Can>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </DataList>
                             )}
 
                             <p className="page-subtitle" style={{ marginTop: '1rem' }}>
@@ -286,7 +288,7 @@ export function ProductsPage() {
               })}
             </tbody>
           </table>
-        </div>
+        </DataList>
       )}
       {data && (
         <PaginationBar

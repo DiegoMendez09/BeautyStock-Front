@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardReport } from '../../../api/modules'
-
+import { DataList } from '../../../components/ui/DataList'
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
@@ -51,51 +51,55 @@ export function ReportsPage() {
             {data.lowStockItems.length === 0 ? (
               <p className="page-subtitle">Sin alertas</p>
             ) : (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>SKU</th>
-                    <th>Producto</th>
-                    <th>Existencias</th>
-                    <th>Mín.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.lowStockItems.map((item) => (
-                    <tr key={item.productVariantId}>
-                      <td>{item.sku}</td>
-                      <td>
-                        {item.productName} — {item.variantName}
-                      </td>
-                      <td>{item.stockOnHand}</td>
-                      <td>{item.reorderLevel}</td>
+              <DataList label="Existencias bajas">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>SKU</th>
+                      <th>Producto</th>
+                      <th>Existencias</th>
+                      <th>Mín.</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {data.lowStockItems.map((item) => (
+                      <tr key={item.productVariantId}>
+                        <td data-label="SKU">{item.sku}</td>
+                        <td data-label="Producto">
+                          {item.productName} — {item.variantName}
+                        </td>
+                        <td data-label="Existencias">{item.stockOnHand}</td>
+                        <td data-label="Mín.">{item.reorderLevel}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </DataList>
             )}
           </div>
 
           <div className="card">
             <h2 className="card-title">Top productos</h2>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th>Cant.</th>
-                  <th>Ingresos</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.topProducts.map((item) => (
-                  <tr key={item.productVariantId}>
-                    <td>{item.label}</td>
-                    <td>{item.quantitySold}</td>
-                    <td>{formatPrice(item.revenue)}</td>
+            <DataList label="Productos más vendidos">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Cant.</th>
+                    <th>Ingresos</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {data.topProducts.map((item) => (
+                    <tr key={item.productVariantId}>
+                      <td data-label="Producto">{item.label}</td>
+                      <td data-label="Cant.">{item.quantitySold}</td>
+                      <td data-label="Ingresos">{formatPrice(item.revenue)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </DataList>
           </div>
         </>
       )}

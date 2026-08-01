@@ -2,8 +2,10 @@
   position: fixed;
   bottom: var(--space-xl);
   right: var(--space-xl);
-  width: 3.25rem;
-  height: 3.25rem;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
   border-radius: 999px;
   background: var(--color-accent);
   color: var(--color-text-inverse);
@@ -25,13 +27,19 @@
 
 .faq-widget__toggle--store {
   background: var(--color-primary);
-  bottom: 1.25rem;
-  right: 1.25rem;
+  bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+  right: max(1.25rem, env(safe-area-inset-right, 0px));
+  width: 3.25rem;
+  height: 3.25rem;
   z-index: 50;
 }
 
 .faq-widget__toggle--store:hover {
   background: color-mix(in srgb, var(--color-primary) 88%, black);
+}
+
+.faq-widget__backdrop {
+  display: none;
 }
 
 .faq-widget__panel {
@@ -40,6 +48,7 @@
   right: var(--space-xl);
   width: min(400px, calc(100vw - 2rem));
   height: min(560px, calc(100vh - 7rem));
+  max-height: calc(100dvh - 7rem);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -52,8 +61,8 @@
 }
 
 .faq-widget__panel--store {
-  bottom: calc(1.25rem + 4rem);
-  right: 1.25rem;
+  bottom: calc(max(1.25rem, env(safe-area-inset-bottom, 0px)) + 4rem);
+  right: max(1.25rem, env(safe-area-inset-right, 0px));
   z-index: 50;
   border-color: color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
 }
@@ -70,6 +79,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-sm);
+  flex-shrink: 0;
 }
 
 .faq-widget__panel--store .faq-widget__header {
@@ -78,6 +88,13 @@
     color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)),
     var(--color-surface)
   );
+}
+
+.faq-widget__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
 }
 
 .faq-widget__title {
@@ -99,10 +116,11 @@
   background: var(--color-surface);
   color: var(--color-text-muted);
   border-radius: var(--radius-md);
-  padding: 0.35rem 0.55rem;
+  padding: 0.45rem 0.7rem;
   font-size: var(--font-size-sm);
   cursor: pointer;
   white-space: nowrap;
+  min-height: var(--touch-target-min);
 }
 
 .faq-widget__new:hover {
@@ -110,9 +128,31 @@
   color: var(--color-accent);
 }
 
+.faq-widget__close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.faq-widget__close:hover {
+  background: var(--color-surface-muted);
+}
+
 .faq-widget__messages {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: var(--space-md);
   display: flex;
   flex-direction: column;
@@ -120,6 +160,7 @@
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 40%),
     var(--color-surface-muted, #f6f7f9);
+  min-height: 0;
 }
 
 .faq-chat {
@@ -175,6 +216,9 @@
   cursor: pointer;
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
+  min-height: 2.25rem;
+  display: flex;
+  align-items: center;
 }
 
 .faq-chat__card p {
@@ -195,7 +239,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 0.65rem 0.75rem;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
@@ -225,7 +269,7 @@
 .faq-product-card__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.5rem;
   align-items: center;
 }
 
@@ -234,6 +278,10 @@
   color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
+  min-height: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.25rem;
 }
 
 .faq-widget__panel--store .faq-product-card__link {
@@ -242,7 +290,8 @@
 
 .faq-product-card__add {
   font-size: var(--font-size-sm);
-  padding: 0.35rem 0.65rem;
+  padding: 0.45rem 0.85rem;
+  min-height: var(--touch-target-min);
 }
 
 .faq-widget__suggestions {
@@ -250,6 +299,7 @@
   flex-wrap: wrap;
   gap: 0.4rem;
   padding: 0 var(--space-md) var(--space-sm);
+  flex-shrink: 0;
 }
 
 .faq-chip {
@@ -257,9 +307,10 @@
   background: var(--color-surface);
   color: var(--color-text);
   border-radius: 999px;
-  padding: 0.3rem 0.7rem;
+  padding: 0.45rem 0.85rem;
   font-size: var(--font-size-sm);
   cursor: pointer;
+  min-height: var(--touch-target-min);
 }
 
 .faq-chip:hover {
@@ -278,6 +329,8 @@
   padding: var(--space-md);
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
+  flex-shrink: 0;
+  padding-bottom: max(var(--space-md), env(safe-area-inset-bottom, 0px));
 }
 
 .faq-widget__input {
@@ -289,16 +342,96 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 480px) {
-  .faq-widget__panel,
-  .faq-widget__panel--store {
-    width: calc(100vw - 1rem);
-    right: 0.5rem;
-    height: min(70vh, 520px);
+/* ——— Móvil: hoja inferior casi a ancho completo ——— */
+@media (max-width: 720px) {
+  .faq-widget__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 24, 40, 0.45);
+    border: none;
+    z-index: 190;
+    cursor: pointer;
   }
 
-  .faq-widget__toggle--store {
-    right: 0.75rem;
-    bottom: 0.75rem;
+  .faq-widget__backdrop--store {
+    z-index: 45;
+  }
+
+  .faq-widget__panel,
+  .faq-widget__panel--store {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: none;
+    height: min(88dvh, 640px);
+    max-height: calc(100dvh - 0.5rem);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    z-index: 200;
+  }
+
+  .faq-widget__panel--store {
+    z-index: 55;
+  }
+
+  .faq-widget__close {
+    display: inline-flex;
+  }
+
+  .faq-widget__toggle {
+    bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+    right: max(1rem, env(safe-area-inset-right, 0px));
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+  /* Cierre vía hoja (botón X + fondo); el FAB no compite con CTAs */
+  .faq-widget__toggle--open {
+    display: none;
+  }
+
+  .faq-chat {
+    max-width: 100%;
+  }
+
+  .faq-chat__bubble {
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+  }
+
+  .faq-product-card__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .faq-product-card__add,
+  .faq-product-card__link {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .faq-widget__suggestions {
+    max-height: 5.5rem;
+    overflow-y: auto;
+  }
+
+  .faq-widget__composer {
+    gap: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .faq-widget__new {
+    padding: 0.4rem 0.55rem;
+    font-size: var(--font-size-xs);
+  }
+
+  .faq-widget__header {
+    padding: var(--space-sm) var(--space-md);
   }
 }

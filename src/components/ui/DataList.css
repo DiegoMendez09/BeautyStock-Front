@@ -1,0 +1,157 @@
+/**
+ * Tablas → tarjetas en móvil (WCAG: thead permanece accesible, foco intacto).
+ * Activar con `.table-wrapper--cards` (vía <DataList>) o `.data-table--cards`.
+ */
+
+@media (max-width: 720px) {
+  .table-wrapper--cards {
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .table-wrapper--cards > .data-table,
+  .data-table--cards {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .table-wrapper--cards > .data-table thead,
+  .data-table--cards thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .table-wrapper--cards > .data-table tbody,
+  .data-table--cards tbody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .table-wrapper--cards > .data-table tbody tr,
+  .data-table--cards tbody tr {
+    display: block;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-sm) 0;
+    overflow: hidden;
+  }
+
+  .table-wrapper--cards > .data-table tbody tr:hover,
+  .data-table--cards tbody tr:hover {
+    background: var(--color-surface);
+  }
+
+  .table-wrapper--cards > .data-table tbody td,
+  .data-table--cards tbody td {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, 34%) 1fr;
+    align-items: start;
+    gap: var(--space-sm);
+    padding: 0.55rem var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    word-break: break-word;
+  }
+
+  .table-wrapper--cards > .data-table tbody td:last-child,
+  .data-table--cards tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .table-wrapper--cards > .data-table tbody td::before,
+  .data-table--cards tbody td::before {
+    content: attr(data-label);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    line-height: var(--line-height-tight);
+    padding-top: 0.15rem;
+  }
+
+  .table-wrapper--cards > .data-table tbody td:not([data-label])::before,
+  .table-wrapper--cards > .data-table tbody td[data-label='']::before,
+  .data-table--cards tbody td:not([data-label])::before,
+  .data-table--cards tbody td[data-label='']::before {
+    content: none;
+    display: none;
+  }
+
+  .table-wrapper--cards > .data-table tbody td:not([data-label]),
+  .table-wrapper--cards > .data-table tbody td[data-label=''],
+  .table-wrapper--cards > .data-table tbody td.data-table__actions,
+  .data-table--cards tbody td:not([data-label]),
+  .data-table--cards tbody td[data-label=''],
+  .data-table--cards tbody td.data-table__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    grid-template-columns: none;
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+  }
+
+  .table-wrapper--cards > .data-table tbody td.data-table__expand,
+  .table-wrapper--cards > .data-table tbody td[colspan],
+  .data-table--cards tbody td.data-table__expand,
+  .data-table--cards tbody td[colspan] {
+    display: block;
+    grid-template-columns: none;
+    padding: var(--space-md);
+  }
+
+  .table-wrapper--cards > .data-table tbody td.data-table__expand::before,
+  .table-wrapper--cards > .data-table tbody td[colspan]::before,
+  .data-table--cards tbody td.data-table__expand::before,
+  .data-table--cards tbody td[colspan]::before {
+    content: none;
+    display: none;
+  }
+
+  /* Nested tables inside expanded rows also stack as cards */
+  .table-wrapper--cards .data-table .data-table,
+  .data-table--cards .data-table {
+    display: block;
+    width: 100%;
+  }
+
+  .table-wrapper--cards .data-table .data-table thead,
+  .data-table--cards .data-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .table-wrapper--cards .data-table .data-table tbody,
+  .data-table--cards .data-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .table-wrapper--cards .data-table .data-table tbody tr,
+  .data-table--cards .data-table tbody tr {
+    box-shadow: none;
+    border-radius: var(--radius-md);
+  }
+}

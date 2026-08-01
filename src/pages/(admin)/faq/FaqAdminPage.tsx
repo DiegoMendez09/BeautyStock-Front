@@ -13,11 +13,11 @@ import {
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
 import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
+import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { useAuth } from '../../../hooks/useAuth'
 import { P } from '../../../lib/permissions'
-
 type StatusFilter = 'all' | 'active' | 'inactive'
 
 const emptyForm = {
@@ -312,7 +312,7 @@ export function FaqAdminPage() {
         </div>
       ) : (
         <>
-          <div className="table-wrapper">
+          <DataList label="Artículos de ayuda">
             <table className="data-table">
               <thead>
                 <tr>
@@ -320,14 +320,14 @@ export function FaqAdminPage() {
                   <th>Pregunta</th>
                   <th>Estado</th>
                   <th>Orden</th>
-                  <th />
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {articles.map((article) => (
                   <tr key={article.faqArticleId}>
-                    <td>{article.categoryName}</td>
-                    <td>
+                    <td data-label="Categoría">{article.categoryName}</td>
+                    <td data-label="Pregunta">
                       <strong>{article.question}</strong>
                       <div style={{ color: 'var(--color-text-muted)', marginTop: 4 }}>
                         {article.answer.length > 160
@@ -335,13 +335,13 @@ export function FaqAdminPage() {
                           : article.answer}
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Estado">
                       <span className={`badge ${article.isActive ? 'badge-success' : 'badge-muted'}`}>
                         {article.isActive ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
-                    <td>{article.sortOrder}</td>
-                    <td>
+                    <td data-label="Orden">{article.sortOrder}</td>
+                    <td data-label="" className="data-table__actions">
                       <Can permission={P.Faq.Manage}>
                         <div className="row-actions">
                           <button
@@ -366,7 +366,7 @@ export function FaqAdminPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </DataList>
           {data && (
             <PaginationBar
               page={data.page}

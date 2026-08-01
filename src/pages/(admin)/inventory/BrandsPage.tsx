@@ -5,10 +5,10 @@ import { createBrand, deactivateBrand, deleteBrand } from '../../../api/catalogM
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
 import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
+import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { P } from '../../../lib/permissions'
-
 export function BrandsPage() {
   const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
@@ -94,27 +94,27 @@ export function BrandsPage() {
         </div>
       ) : (
         <>
-          <div className="table-wrapper">
+          <DataList label="Lista de marcas">
             <table className="data-table">
               <thead>
                 <tr>
                   <th>Nombre</th>
                   <th>País</th>
                   <th>Estado</th>
-                  <th />
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {brands.map((brand) => (
                   <tr key={brand.brandId}>
-                    <td>{brand.name}</td>
-                    <td>{brand.countryOfOrigin ?? '—'}</td>
-                    <td>
+                    <td data-label="Nombre">{brand.name}</td>
+                    <td data-label="País">{brand.countryOfOrigin ?? '—'}</td>
+                    <td data-label="Estado">
                       <span className={`badge ${brand.isActive ? 'badge-success' : 'badge-muted'}`}>
                         {brand.isActive ? 'Activa' : 'Inactiva'}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="" className="data-table__actions">
                       <Can permission={P.Catalog.Delete}>
                         <RowActions
                           isActive={brand.isActive}
@@ -129,7 +129,7 @@ export function BrandsPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </DataList>
           {data && (
             <PaginationBar
               page={data.page}

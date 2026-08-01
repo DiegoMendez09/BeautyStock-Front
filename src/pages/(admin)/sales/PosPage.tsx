@@ -241,6 +241,7 @@ export function PosPage() {
                       className="btn btn-ghost btn-icon"
                       onClick={() => removeLine(line.variant.productVariantId)}
                       title="Eliminar"
+                      aria-label={`Quitar ${line.variant.productName} del carrito`}
                     >
                       ×
                     </button>

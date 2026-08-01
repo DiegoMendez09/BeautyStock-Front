@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getNotifications, markNotificationRead } from '../../../api/ops'
+import { DataList } from '../../../components/ui/DataList'
 import { useInventoryHub } from '../../../hooks/useInventoryHub'
 import { severityLabel } from '../../../lib/labels'
 import { useState } from 'react'
-
 export function NotificationsPage() {
   const [toast, setToast] = useState('')
   const queryClient = useQueryClient()
@@ -40,7 +40,7 @@ export function NotificationsPage() {
       ) : items.length === 0 ? (
         <div className="empty-state">Sin notificaciones</div>
       ) : (
-        <div className="table-wrapper">
+        <DataList label="Notificaciones">
           <table className="data-table">
             <thead>
               <tr>
@@ -48,17 +48,17 @@ export function NotificationsPage() {
                 <th>Título</th>
                 <th>Mensaje</th>
                 <th>Severidad</th>
-                <th />
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {items.map((item) => (
                 <tr key={item.notificationId}>
-                  <td>{new Date(item.createdAt).toLocaleString('es-PE')}</td>
-                  <td>{item.title}</td>
-                  <td>{item.message}</td>
-                  <td>{severityLabel(item.severity)}</td>
-                  <td>
+                  <td data-label="Fecha">{new Date(item.createdAt).toLocaleString('es-PE')}</td>
+                  <td data-label="Título">{item.title}</td>
+                  <td data-label="Mensaje">{item.message}</td>
+                  <td data-label="Severidad">{severityLabel(item.severity)}</td>
+                  <td data-label="" className="data-table__actions">
                     {!item.isRead && (
                       <button
                         type="button"
@@ -73,7 +73,7 @@ export function NotificationsPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </DataList>
       )}
     </div>
   )

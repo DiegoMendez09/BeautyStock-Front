@@ -4,11 +4,11 @@ import { deactivateCategory, deleteCategory, createCategory } from '../../../api
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
 import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
+import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { useCategoriesQuery } from '../../../hooks/useCatalogQueries'
 import { P } from '../../../lib/permissions'
-
 export function CategoriesPage() {
   const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
@@ -92,29 +92,29 @@ export function CategoriesPage() {
         <div className="empty-state">No hay categorías registradas</div>
       ) : (
         <>
-          <div className="table-wrapper">
+          <DataList label="Lista de categorías">
             <table className="data-table">
               <thead>
                 <tr>
                   <th>Nombre</th>
                   <th>Descripción</th>
                   <th>Estado</th>
-                  <th />
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {categories.map((category) => (
                   <tr key={category.categoryId}>
-                    <td>{category.name}</td>
-                    <td>{category.description ?? '—'}</td>
-                    <td>
+                    <td data-label="Nombre">{category.name}</td>
+                    <td data-label="Descripción">{category.description ?? '—'}</td>
+                    <td data-label="Estado">
                       <span
                         className={`badge ${category.isActive ? 'badge-success' : 'badge-muted'}`}
                       >
                         {category.isActive ? 'Activa' : 'Inactiva'}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="" className="data-table__actions">
                       <Can permission={P.Catalog.Delete}>
                         <RowActions
                           isActive={category.isActive}
@@ -129,7 +129,7 @@ export function CategoriesPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </DataList>
           {data && (
             <PaginationBar
               page={data.page}
