@@ -16,7 +16,9 @@ function formatPrice(value: number): string {
 }
 
 function statusBadge(status: string) {
-  if (status === 'Completed') return 'badge badge-success'
+  const s = status.toLowerCase()
+  if (s === 'completed' || s === 'confirmed') return 'badge badge-success'
+  if (s === 'pending') return 'badge badge-warning'
   return 'badge badge-muted'
 }
 

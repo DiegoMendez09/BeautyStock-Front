@@ -1,9 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getStoreProduct } from '../../../api/store'
 import { createSale } from '../../../api/sales'
+import { getStoreProduct } from '../../../api/store'
+import { PaymentMethodPicker } from '../../../components/sales/PaymentMethodPicker'
 import { useAuth } from '../../../hooks/useAuth'
+import { usePaymentMethods } from '../../../hooks/usePaymentMethods'
 import { P } from '../../../lib/permissions'
 import { useCartStore } from '../../../stores/cartStore'
 import './MarketplacePage.css'
@@ -24,6 +26,15 @@ export function ProductDetailPage() {
   const addItem = useCartStore((s) => s.addItem)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const { methods, defaultCode } = usePaymentMethods()
+  const [paymentMethod, setPaymentMethod] = useState(defaultCode)
+
+  useEffect(() => {
+    if (!methods.some((m) => m.code === paymentMethod)) {
+      setPaymentMethod(defaultCode)
+    }
+  }, [methods, defaultCode, paymentMethod])
 
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ['store', 'product', productId],
@@ -40,7 +51,7 @@ export function ProductDetailPage() {
     mutationFn: async () => {
       if (!selected) throw new Error('Sin presentación')
       return createSale({
-        paymentMethod: 'Card',
+        paymentMethod,
         discountAmount: 0,
         lines: [
           {
@@ -53,9 +64,10 @@ export function ProductDetailPage() {
       })
     },
     onSuccess: (sale) => {
+      setError('')
       setMessage(`Compra realizada. Comprobante ${sale.ticketNumber}`)
     },
-    onError: () => setMessage('No se pudo completar la compra'),
+    onError: () => setError('No se pudo completar la compra'),
   })
 
   if (isLoading) {
@@ -145,7 +157,17 @@ export function ProductDetailPage() {
           ))}
         </div>
 
+        <div style={{ marginTop: '1rem', maxWidth: 320 }}>
+          <PaymentMethodPicker
+            name="detail-payment"
+            value={paymentMethod}
+            onChange={setPaymentMethod}
+            methods={methods}
+          />
+        </div>
+
         {message && <div className="alert alert-success">{message}</div>}
+        {error && <div className="alert alert-error">{error}</div>}
 
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
@@ -162,7 +184,11 @@ export function ProductDetailPage() {
             disabled={!selected || selected.stockOnHand <= 0 || buyNow.isPending}
             onClick={handleBuy}
           >
-            {isAuthenticated ? 'Comprar ahora' : 'Iniciar sesión para comprar'}
+            {isAuthenticated
+              ? buyNow.isPending
+                ? 'Procesando…'
+                : 'Comprar ahora'
+              : 'Iniciar sesión para comprar'}
           </button>
           <Link to="/tienda" className="btn btn-ghost">
             Volver al catálogo

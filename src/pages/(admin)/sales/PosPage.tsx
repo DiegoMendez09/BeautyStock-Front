@@ -1,6 +1,8 @@
-import { useCallback, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { getProductByBarcode, getProductVariantById } from '../../../api/catalog'
+import { PaymentMethodPicker } from '../../../components/sales/PaymentMethodPicker'
 import { TypeaheadInput } from '../../../components/ui/TypeaheadInput'
+import { usePaymentMethods } from '../../../hooks/usePaymentMethods'
 import { useCreateSaleMutation } from '../../../hooks/useSalesMutations'
 import type { CartLine } from '../../../types'
 import './PosPage.css'
@@ -20,8 +22,16 @@ export function PosPage() {
   const [success, setSuccess] = useState('')
   const [customerId, setCustomerId] = useState<number | undefined>()
   const [customerLabel, setCustomerLabel] = useState('')
+  const { methods, defaultCode } = usePaymentMethods()
+  const [paymentMethod, setPaymentMethod] = useState(defaultCode)
   const barcodeRef = useRef<HTMLInputElement>(null)
   const createSaleMutation = useCreateSaleMutation()
+
+  useEffect(() => {
+    if (!methods.some((m) => m.code === paymentMethod)) {
+      setPaymentMethod(defaultCode)
+    }
+  }, [methods, defaultCode, paymentMethod])
 
   const subtotal = cart.reduce(
     (sum, line) => sum + line.variant.salePrice * line.quantity,
@@ -106,7 +116,7 @@ export function PosPage() {
           quantity: line.quantity,
           unitPrice: line.variant.salePrice,
         })),
-        paymentMethod: 'Cash',
+        paymentMethod,
       })
       setSuccess(
         `Venta ${response.ticketNumber} — Total: ${formatPrice(response.totalAmount)}`,
@@ -272,6 +282,12 @@ export function PosPage() {
             <span>Total</span>
             <span>{formatPrice(subtotal)}</span>
           </div>
+          <PaymentMethodPicker
+            name="pos-payment"
+            value={paymentMethod}
+            onChange={setPaymentMethod}
+            methods={methods}
+          />
           <div className="pos-summary__actions">
             <button
               type="button"

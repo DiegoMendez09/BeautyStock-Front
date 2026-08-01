@@ -1,12 +1,37 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { getSettingsOverview } from '../../../api/modules'
 import { DataList } from '../../../components/ui/DataList'
+import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { roleLabel } from '../../../lib/labels'
+
 export function SettingsPage() {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['settings', 'overview'],
     queryFn: getSettingsOverview,
+    placeholderData: keepPreviousData,
   })
+
+  const [rolesPage, setRolesPage] = useState(DEFAULT_PAGE)
+  const [rolesPageSize, setRolesPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const [permsPage, setPermsPage] = useState(DEFAULT_PAGE)
+  const [permsPageSize, setPermsPageSize] = useState(DEFAULT_PAGE_SIZE)
+
+  const roles = data?.roles ?? []
+  const rolePermissions = data?.rolePermissions ?? []
+
+  const rolesTotalPages = Math.max(1, Math.ceil(roles.length / rolesPageSize) || 1)
+  const rolesPageItems = useMemo(() => {
+    const start = (rolesPage - 1) * rolesPageSize
+    return roles.slice(start, start + rolesPageSize)
+  }, [roles, rolesPage, rolesPageSize])
+
+  const permsTotalPages = Math.max(1, Math.ceil(rolePermissions.length / permsPageSize) || 1)
+  const permsPageItems = useMemo(() => {
+    const start = (permsPage - 1) * permsPageSize
+    return rolePermissions.slice(start, start + permsPageSize)
+  }, [rolePermissions, permsPage, permsPageSize])
 
   return (
     <div className="page">
@@ -29,7 +54,45 @@ export function SettingsPage() {
         <>
           <div className="card" style={{ marginBottom: '1rem' }}>
             <h2 className="card-title">Roles</h2>
-            <p>{data.roles.map(roleLabel).join(' · ')}</p>
+            <DataList label="Roles del sistema">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Rol</th>
+                    <th>Código</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rolesPageItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={2}>Sin roles</td>
+                    </tr>
+                  ) : (
+                    rolesPageItems.map((role) => (
+                      <tr key={role}>
+                        <td data-label="Rol">{roleLabel(role)}</td>
+                        <td data-label="Código">
+                          <code>{role}</code>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </DataList>
+            <PaginationBar
+              page={Math.min(rolesPage, rolesTotalPages)}
+              pageSize={rolesPageSize}
+              totalCount={roles.length}
+              totalPages={rolesTotalPages}
+              isFetching={isFetching}
+              label="Paginación de roles"
+              onPageChange={setRolesPage}
+              onPageSizeChange={(size) => {
+                setRolesPageSize(size)
+                setRolesPage(1)
+              }}
+            />
           </div>
 
           <div className="card" style={{ marginBottom: '1rem' }}>
@@ -59,7 +122,7 @@ export function SettingsPage() {
           </div>
 
           <div className="card">
-            <h2 className="card-title">Permisos por rol (extracto)</h2>
+            <h2 className="card-title">Permisos por rol</h2>
             <DataList label="Permisos por rol">
               <table className="data-table">
                 <thead>
@@ -69,15 +132,34 @@ export function SettingsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.rolePermissions.slice(0, 80).map((rp, i) => (
-                    <tr key={`${rp.role}-${rp.permissionCode}-${i}`}>
-                      <td data-label="Rol">{roleLabel(rp.role)}</td>
-                      <td data-label="Permiso">{rp.permissionCode}</td>
+                  {permsPageItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={2}>Sin permisos</td>
                     </tr>
-                  ))}
+                  ) : (
+                    permsPageItems.map((rp, i) => (
+                      <tr key={`${rp.role}-${rp.permissionCode}-${i}`}>
+                        <td data-label="Rol">{roleLabel(rp.role)}</td>
+                        <td data-label="Permiso">{rp.permissionCode}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </DataList>
+            <PaginationBar
+              page={Math.min(permsPage, permsTotalPages)}
+              pageSize={permsPageSize}
+              totalCount={rolePermissions.length}
+              totalPages={permsTotalPages}
+              isFetching={isFetching}
+              label="Paginación de permisos por rol"
+              onPageChange={setPermsPage}
+              onPageSizeChange={(size) => {
+                setPermsPageSize(size)
+                setPermsPage(1)
+              }}
+            />
           </div>
         </>
       )}

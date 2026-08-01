@@ -1,8 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { createSale } from '../../../api/sales'
+import { PaymentMethodPicker } from '../../../components/sales/PaymentMethodPicker'
 import { useAuth } from '../../../hooks/useAuth'
+import { usePaymentMethods } from '../../../hooks/usePaymentMethods'
 import { P } from '../../../lib/permissions'
 import { useCartStore } from '../../../stores/cartStore'
 import './MarketplacePage.css'
@@ -25,11 +27,19 @@ export function CartPage() {
   const totalAmount = useCartStore((s) => s.totalAmount())
   const [error, setError] = useState('')
   const [ticket, setTicket] = useState('')
+  const { methods, defaultCode } = usePaymentMethods()
+  const [paymentMethod, setPaymentMethod] = useState(defaultCode)
+
+  useEffect(() => {
+    if (!methods.some((m) => m.code === paymentMethod)) {
+      setPaymentMethod(defaultCode)
+    }
+  }, [methods, defaultCode, paymentMethod])
 
   const checkout = useMutation({
     mutationFn: () =>
       createSale({
-        paymentMethod: 'Card',
+        paymentMethod,
         discountAmount: 0,
         lines: items.map((i) => ({
           productVariantId: i.productVariantId,
@@ -103,7 +113,10 @@ export function CartPage() {
                     {formatPrice(item.unitPrice)}
                   </div>
                 </div>
-                <div className="cart-line__actions" style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+                <div
+                  className="cart-line__actions"
+                  style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}
+                >
                   <label className="sr-only" htmlFor={`cart-qty-${item.productVariantId}`}>
                     Cantidad de {item.productName}
                   </label>
@@ -136,6 +149,12 @@ export function CartPage() {
               <span>Total</span>
               <strong>{formatPrice(totalAmount)}</strong>
             </div>
+            <PaymentMethodPicker
+              name="cart-payment"
+              value={paymentMethod}
+              onChange={setPaymentMethod}
+              methods={methods}
+            />
             {error && <div className="alert alert-error">{error}</div>}
             <button
               type="button"

@@ -10,6 +10,19 @@ export async function createSale(request: CreateSaleRequest): Promise<SaleRespon
   })
 }
 
+export interface PaymentMethodConfig {
+  code: string
+  label: string
+}
+
+export interface PaymentConfig {
+  methods: PaymentMethodConfig[]
+}
+
+export async function getPaymentConfig(): Promise<PaymentConfig> {
+  return apiClient<PaymentConfig>('/api/v1/sales/payment-config')
+}
+
 export interface SaleListItem {
   saleId: number
   ticketNumber: string

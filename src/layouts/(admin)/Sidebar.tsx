@@ -45,6 +45,15 @@ function expandMenu(menu: ModuleMenuItem[]): ModuleMenuItem[] {
         },
       ]
     }
+    if (item.code === 'Purchases') {
+      return [{ ...item, iconKey: 'purchases' }]
+    }
+    if (item.code === 'Notifications') {
+      return [{ ...item, iconKey: 'notifications' }]
+    }
+    if (item.code === 'Settings') {
+      return [{ ...item, iconKey: 'settings' }]
+    }
     return [item]
   })
 }

@@ -4,6 +4,11 @@ export function paymentMethodLabel(code: string): string {
   switch (code.toLowerCase()) {
     case 'cash':
       return 'Efectivo'
+    case 'mercadopago':
+      return 'Mercado Pago'
+    case 'paypal':
+      return 'PayPal'
+    // Legados / futuros (historial); no se ofrecen en checkout hasta habilitarlos en el API
     case 'card':
       return 'Tarjeta'
     case 'transfer':
@@ -17,6 +22,10 @@ export function paymentMethodLabel(code: string): string {
 
 export function saleStatusLabel(status: string): string {
   switch (status.toLowerCase()) {
+    case 'pending':
+      return 'Pendiente'
+    case 'confirmed':
+      return 'Confirmada'
     case 'completed':
       return 'Completada'
     case 'cancelled':
