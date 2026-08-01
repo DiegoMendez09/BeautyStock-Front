@@ -54,6 +54,9 @@ function expandMenu(menu: ModuleMenuItem[]): ModuleMenuItem[] {
     if (item.code === 'Settings') {
       return [{ ...item, iconKey: 'settings' }]
     }
+    if (item.code === 'BulkUpload') {
+      return [{ ...item, name: 'Carga masiva', routePath: '/panel/carga-masiva', iconKey: 'bulk' }]
+    }
     return [item]
   })
 }

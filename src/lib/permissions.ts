@@ -52,6 +52,9 @@ export const P = {
   Audit: {
     View: 'Audit.View',
   },
+  BulkUpload: {
+    Manage: 'BulkUpload.Manage',
+  },
 } as const
 
 export type PermissionCode = string

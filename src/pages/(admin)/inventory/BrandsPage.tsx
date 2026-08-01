@@ -4,7 +4,6 @@ import { getBrands } from '../../../api/catalog'
 import { createBrand, deactivateBrand, deleteBrand } from '../../../api/catalogMutations'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
-import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
 import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
@@ -58,9 +57,6 @@ export function BrandsPage() {
       {isError && <div className="alert alert-error">No se pudieron cargar las marcas</div>}
 
       <Can permission={P.Catalog.Create}>
-        <div style={{ marginBottom: '1.25rem' }}>
-          <BulkUploadDialog module="brands" onSuccess={invalidate} />
-        </div>
         <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
           <h2 className="card-title">Nueva marca</h2>
           <div className="page-filters">

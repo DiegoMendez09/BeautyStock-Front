@@ -8,7 +8,6 @@ import {
   updateCustomer,
 } from '../../../api/customers'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
-import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
 import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
@@ -75,9 +74,6 @@ export function CustomersPage() {
 
       {canCreate && (
         <>
-          <div style={{ marginBottom: '1.25rem' }}>
-            <BulkUploadDialog module="customers" onSuccess={invalidate} />
-          </div>
           <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
             <h2 className="card-title">Nuevo cliente</h2>
             <div className="page-filters">

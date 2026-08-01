@@ -3,6 +3,7 @@ import { AppShell } from '../layouts/(admin)/AppShell'
 import { StoreShell } from '../layouts/(public)/StoreShell'
 import { useAuth } from '../hooks/useAuth'
 import { AuditPage } from '../pages/(admin)/audit/AuditPage'
+import { BulkUploadPage } from '../pages/(admin)/bulk/BulkUploadPage'
 import { CustomersPage } from '../pages/(admin)/customers/CustomersPage'
 import { DashboardPage } from '../pages/(admin)/DashboardPage'
 import { FaqAdminPage } from '../pages/(admin)/faq/FaqAdminPage'
@@ -79,6 +80,7 @@ export function AppRouter() {
         <Route path="auditoria" element={<AuditPage />} />
         <Route path="usuarios" element={<UsersPage />} />
         <Route path="configuracion" element={<SettingsPage />} />
+        <Route path="carga-masiva" element={<BulkUploadPage />} />
       </Route>
 
       {/* Compatibilidad con menú del API (rutas sin /panel) */}
@@ -103,6 +105,7 @@ export function AppRouter() {
         <Route path="auditoria" element={<AuditPage />} />
         <Route path="usuarios" element={<UsersPage />} />
         <Route path="configuracion" element={<SettingsPage />} />
+        <Route path="carga-masiva" element={<BulkUploadPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/tienda" replace />} />

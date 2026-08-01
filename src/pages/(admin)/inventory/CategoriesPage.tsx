@@ -3,7 +3,6 @@ import { useState, type FormEvent } from 'react'
 import { deactivateCategory, deleteCategory, createCategory } from '../../../api/catalogMutations'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
-import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
 import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
@@ -54,9 +53,6 @@ export function CategoriesPage() {
       {isError && <div className="alert alert-error">No se pudieron cargar las categorías</div>}
 
       <Can permission={P.Catalog.Create}>
-        <div style={{ marginBottom: '1.25rem' }}>
-          <BulkUploadDialog module="categories" onSuccess={invalidate} />
-        </div>
         <form className="card" onSubmit={handleCreate} style={{ marginBottom: '1.25rem' }}>
           <h2 className="card-title">Nueva categoría</h2>
           <div className="page-filters">

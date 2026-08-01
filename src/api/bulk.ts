@@ -15,6 +15,8 @@ export type BulkModule =
 export interface BulkRowError {
   rowNumber: number
   message: string
+  /** Resumen de celdas de la fila (datos clave). */
+  raw?: string | null
 }
 
 export interface BulkImportResult {

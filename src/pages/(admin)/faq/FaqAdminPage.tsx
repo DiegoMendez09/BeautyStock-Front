@@ -12,7 +12,6 @@ import {
 } from '../../../api/modules'
 import { DEFAULT_PAGE_SIZE } from '../../../api/pagination'
 import { Can } from '../../../components/auth/Can'
-import { BulkUploadDialog } from '../../../components/ui/BulkUploadDialog'
 import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
@@ -169,11 +168,6 @@ export function FaqAdminPage() {
       )}
 
       <Can permission={P.Faq.Manage}>
-        {!editingId && (
-          <div style={{ marginBottom: '1.25rem' }}>
-            <BulkUploadDialog module="faq" onSuccess={invalidate} />
-          </div>
-        )}
         <form className="card" onSubmit={handleSubmit} style={{ marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center' }}>
             <h2 className="card-title" style={{ margin: 0 }}>
