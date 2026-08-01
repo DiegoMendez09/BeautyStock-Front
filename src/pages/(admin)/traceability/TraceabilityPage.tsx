@@ -4,6 +4,7 @@ import { getSuppliers, getTraceabilityReport } from '../../../api/modules'
 import { Can } from '../../../components/auth/Can'
 import { DataList } from '../../../components/ui/DataList'
 import { TypeaheadInput } from '../../../components/ui/TypeaheadInput'
+import { formatDateTime } from '../../../lib/datetime'
 import { P } from '../../../lib/permissions'
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -214,7 +215,7 @@ export function TraceabilityPage() {
                                       <td data-label="Orden">{p.orderNumber}</td>
                                       <td data-label="Proveedor">{p.supplierName}</td>
                                       <td data-label="Recibida">
-                                        {new Date(p.receivedAt).toLocaleString('es-PE')}
+                                        {formatDateTime(p.receivedAt)}
                                       </td>
                                       <td data-label="Cantidad">{p.quantity}</td>
                                       <td data-label="Costo unit.">{formatPrice(p.unitCost)}</td>

@@ -3,6 +3,7 @@ import { getNotifications, markNotificationRead } from '../../../api/ops'
 import { DataList } from '../../../components/ui/DataList'
 import { useInventoryHub } from '../../../hooks/useInventoryHub'
 import { severityLabel } from '../../../lib/labels'
+import { formatDateTime } from '../../../lib/datetime'
 import { useState } from 'react'
 export function NotificationsPage() {
   const [toast, setToast] = useState('')
@@ -54,7 +55,7 @@ export function NotificationsPage() {
             <tbody>
               {items.map((item) => (
                 <tr key={item.notificationId}>
-                  <td data-label="Fecha">{new Date(item.createdAt).toLocaleString('es-PE')}</td>
+                  <td data-label="Fecha">{formatDateTime(item.createdAt)}</td>
                   <td data-label="Título">{item.title}</td>
                   <td data-label="Mensaje">{item.message}</td>
                   <td data-label="Severidad">{severityLabel(item.severity)}</td>

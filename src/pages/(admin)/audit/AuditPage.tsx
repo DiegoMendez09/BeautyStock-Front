@@ -20,17 +20,19 @@ import { Can } from '../../../components/auth/Can'
 import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { useAuth } from '../../../hooks/useAuth'
+import { formatDateTime } from '../../../lib/datetime'
 import { P } from '../../../lib/permissions'
 type AuditTab = 'logins' | 'audit' | 'application' | 'faq-chat'
 
+/** Day bounds as Colombia wall-clock (matches datetime2 without TZ). */
 function toIsoStart(date: string): string | undefined {
   if (!date) return undefined
-  return `${date}T00:00:00.000Z`
+  return `${date}T00:00:00`
 }
 
 function toIsoEnd(date: string): string | undefined {
   if (!date) return undefined
-  return `${date}T23:59:59.999Z`
+  return `${date}T23:59:59.999`
 }
 
 export function AuditPage() {
@@ -448,7 +450,7 @@ function LoginTable({
         <tbody>
           {items.map((log) => (
             <tr key={log.loginLogId}>
-              <td data-label="Fecha">{new Date(log.attemptedAt).toLocaleString('es-PE')}</td>
+              <td data-label="Fecha">{formatDateTime(log.attemptedAt)}</td>
               <td data-label="Correo">{log.emailAttempted}</td>
               <td data-label="Usuario">{log.userFullName ?? '—'}</td>
               <td data-label="Resultado">
@@ -507,7 +509,7 @@ function AuditTable({
         <tbody>
           {items.map((log) => (
             <tr key={log.auditLogId}>
-              <td data-label="Fecha">{new Date(log.createdAt).toLocaleString('es-PE')}</td>
+              <td data-label="Fecha">{formatDateTime(log.createdAt)}</td>
               <td data-label="Usuario">{log.userFullName ?? (log.userAccountId ? `#${log.userAccountId}` : '—')}</td>
               <td data-label="Acción">{log.action}</td>
               <td data-label="Entidad">{log.entityName}</td>
@@ -563,7 +565,7 @@ function ApplicationTable({
         <tbody>
           {items.map((log) => (
             <tr key={log.applicationLogId}>
-              <td data-label="Fecha">{new Date(log.createdAt).toLocaleString('es-PE')}</td>
+              <td data-label="Fecha">{formatDateTime(log.createdAt)}</td>
               <td data-label="Nivel">
                 <span
                   className={`badge ${
@@ -632,7 +634,7 @@ function FaqChatTable({
         <tbody>
           {items.map((log) => (
             <tr key={log.faqChatLogId}>
-              <td data-label="Fecha">{new Date(log.createdAt).toLocaleString('es-PE')}</td>
+              <td data-label="Fecha">{formatDateTime(log.createdAt)}</td>
               <td data-label="Usuario">{log.userFullName ?? 'Anónimo'}</td>
               <td data-label="Sesión">
                 <code style={{ fontSize: '0.8em' }}>

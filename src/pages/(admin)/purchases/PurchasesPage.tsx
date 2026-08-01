@@ -17,6 +17,7 @@ import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { RowActions } from '../../../components/ui/RowActions'
 import { TypeaheadInput } from '../../../components/ui/TypeaheadInput'
+import { formatDateTime } from '../../../lib/datetime'
 import { P } from '../../../lib/permissions'
 type Tab = 'orders' | 'new-order' | 'suppliers'
 
@@ -418,7 +419,7 @@ export function PurchasesPage() {
                               </span>
                             </td>
                             <td data-label="Total">{formatPrice(order.totalAmount)}</td>
-                            <td data-label="Fecha">{new Date(order.orderedAt).toLocaleString('es-PE')}</td>
+                            <td data-label="Fecha">{formatDateTime(order.orderedAt)}</td>
                             <td data-label="" className="data-table__actions" style={{ whiteSpace: 'nowrap' }}>
                               <button
                                 type="button"

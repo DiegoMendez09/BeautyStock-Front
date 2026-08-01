@@ -6,6 +6,7 @@ import { Can } from '../../../components/auth/Can'
 import { DataList } from '../../../components/ui/DataList'
 import { PaginationBar } from '../../../components/ui/PaginationBar'
 import { paymentMethodLabel, saleStatusLabel } from '../../../lib/labels'
+import { formatDateTime } from '../../../lib/datetime'
 import { P } from '../../../lib/permissions'
 function formatPrice(value: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -176,7 +177,7 @@ export function SalesHistoryPage() {
                 {sales.map((sale) => (
                   <tr key={sale.saleId}>
                     <td data-label="Comprobante">{sale.ticketNumber}</td>
-                    <td data-label="Fecha">{new Date(sale.soldAt).toLocaleString('es-PE')}</td>
+                    <td data-label="Fecha">{formatDateTime(sale.soldAt)}</td>
                     <td data-label="Vendedor">{sale.soldByFullName}</td>
                     <td data-label="Pago">{paymentMethodLabel(sale.paymentMethod)}</td>
                     <td data-label="Total">{formatPrice(sale.totalAmount)}</td>
